@@ -1,0 +1,13 @@
+{
+  "name": "flat-ornament",
+  "version": "1.0.0",
+  "description": "Parametered execution of data scripts",
+  "main": "index.js",
+  "scripts": {
+    "prepublish": "coffee -c *.coffee.md",
+    "pretest": "npm install",
+    "test": "mocha"
+  },
+  "author": "Stéphane Alnet <stephane@shimaore.net> (https://stephane.shimaore.net/)",
+  "license": "Unlicense"
+}
