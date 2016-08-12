@@ -8,14 +8,14 @@ Run
 Parameter: an array of individual ornaments which are executed in the order of the array.
 If any ornament return `true`, skip the remaining ornaments in the list.
 
-    @run = seem (ornaments) ->
+    module.exports = seem (ornaments,commands) ->
       return unless ornaments?
 
       debug 'Processing'
 
       for ornament in ornaments
         debug 'ornament', ornament
-        over = yield do (ornament) => execute.call this, ornament
+        over = yield do (ornament) => execute.call this, ornament, commands
         debug 'over', over
         return if over
 
@@ -38,23 +38,28 @@ Applying `not` to an action probably won't do what you expect.
 
 Return true if a command returned `over`, indicating the remaining ornaments in the list should be skipped.
 
-    execute = seem (ornament) =>
+    execute = seem (ornament,commands) ->
 
       for statement in ornament
         c = commands[statement.type]
 
 Terminate the ornament and continue to the next one, if the command is invalid.
 
-        return false unless c?
+        unless c?
+          debug 'No such command', statement.type
+          return false
 
 Evaluate based on the presence of `params[]` or `param`.
 
         switch
           when statement.params?
+            debug "Calling #{statement.type}", statement.params
             truth = yield c.apply this, statement.params
           when statement.param?
+            debug "Calling #{statement.type}", statement.param
             truth = yield c.call this, statement.param
           else
+            debug "Calling #{statement.type} (no arguments)"
             truth = yield c.call this
 
         if truth is 'over'
@@ -69,6 +74,3 @@ Terminate the ornament and continue to the next one, if any condition or action 
 If no precondition / postcondition / action returned false, continue to the next ornament.
 
       return false
-
-
-
