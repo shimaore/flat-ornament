@@ -41,6 +41,18 @@ Return true if a command returned `over`, indicating the remaining ornaments in 
     execute = seem (ornament,commands) ->
 
       for statement in ornament
+
+A statement might be a {type,param?,params?} object, or a [type,params...] array, or a "type" string.
+
+        if typeof statement is 'string'
+          statement =
+            type: statement
+
+        if statement.length?
+          statement =
+            type: statement[0]
+            params: statement[1...]
+
         c = commands[statement.type]
 
 Terminate the ornament and continue to the next one, if the command is invalid.

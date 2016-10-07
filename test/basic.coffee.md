@@ -24,17 +24,18 @@
 
         ctx.should.have.property 'bear', 3
 
+      commands =
+        one_more_cookie: -> @cookies++; true
+        give_milk: (how_much) -> @milk = how_much; true
+        if_little: -> @bear is 'little'
+        if_big: -> @bear is 'big'
+        if_nice: -> @bear is 'nice'
+        if_angry: -> @bear is 'angry'
+        stop: -> false
+        over: -> 'over'
+        pet: -> @pet = true; true
+
       it 'should process multiple ornaments', seem ->
-        commands =
-          one_more_cookie: -> @cookies++; true
-          give_milk: (how_much) -> @milk = how_much; true
-          if_little: -> @bear is 'little'
-          if_big: -> @bear is 'big'
-          if_nice: -> @bear is 'nice'
-          if_angry: -> @bear is 'angry'
-          stop: -> false
-          over: -> 'over'
-          pet: -> @pet = true; true
         ornaments = [
           [{type:'if_little'},{type:'one_more_cookie'}]
           [{type:'if_big'},{type:'give_milk',param:'plenty'},{type:'over'}]
@@ -66,3 +67,54 @@
         ctx.should.have.property 'cookies', 1
         ctx.should.have.property 'milk', false
         ctx.should.have.property 'pet', true
+
+      it 'should process multiple ornaments (arrays)', seem ->
+        ornaments = [
+          [['if_big'],['give_milk','plenty'],['over']]
+          [['pet']]
+        ]
+
+        ctx = {bear:'little',cookies:0,milk:false}
+        yield run.call ctx, ornaments, commands
+        ctx.should.have.property 'pet', true
+
+        ctx = {bear:'big',cookies:0,milk:false}
+        yield run.call ctx, ornaments, commands
+        ctx.should.have.property 'cookies', 0
+        ctx.should.have.property 'milk', 'plenty'
+        ctx.should.not.have.property 'pet'
+
+      it 'should process multiple ornaments (mixed)', seem ->
+        ornaments = [
+          ['if_little','one_more_cookie']
+          ['if_big',['give_milk','plenty'],'over']
+          ['if_nice','one_more_cookie','one_more_cookie',['give_milk','some']]
+          ['if_angry','one_more_cookie','stop','one_more_cookie',['give_milk','maybe']]
+          ['pet']
+        ]
+
+        ctx = {bear:'little',cookies:0,milk:false}
+        yield run.call ctx, ornaments, commands
+        ctx.should.have.property 'cookies', 1
+        ctx.should.have.property 'milk', false
+        ctx.should.have.property 'pet', true
+
+        ctx = {bear:'big',cookies:0,milk:false}
+        yield run.call ctx, ornaments, commands
+        ctx.should.have.property 'cookies', 0
+        ctx.should.have.property 'milk', 'plenty'
+        ctx.should.not.have.property 'pet'
+
+        ctx = {bear:'nice',cookies:0,milk:false}
+        yield run.call ctx, ornaments, commands
+        ctx.should.have.property 'cookies', 2
+        ctx.should.have.property 'milk', 'some'
+        ctx.should.have.property 'pet', true
+
+        ctx = {bear:'angry',cookies:0,milk:false}
+        yield run.call ctx, ornaments, commands
+        ctx.should.have.property 'cookies', 1
+        ctx.should.have.property 'milk', false
+        ctx.should.have.property 'pet', true
+
+
