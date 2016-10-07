@@ -33,6 +33,17 @@
     var c, i, len, statement, truth;
     for (i = 0, len = ornament.length; i < len; i++) {
       statement = ornament[i];
+      if (typeof statement === 'string') {
+        statement = {
+          type: statement
+        };
+      }
+      if (statement.length != null) {
+        statement = {
+          type: statement[0],
+          params: statement.slice(1)
+        };
+      }
       c = commands[statement.type];
       if (c == null) {
         debug('No such command', statement.type);
