@@ -12,6 +12,7 @@
         yield run.call ctx, [[ type:'1' ]],
           1: ->
             @bear = 'big'
+            true
 
         ctx.should.have.property 'bear', 'big'
 
@@ -20,6 +21,7 @@
         yield run.call ctx, [['1']],
           1: ->
             @bear = 'big'
+            true
 
         ctx.should.have.property 'bear', 'big'
 
@@ -29,6 +31,7 @@
           inc: ->
             @bear ?= 0
             @bear++
+            true
 
         ctx.should.have.property 'bear', 1
 
@@ -38,6 +41,7 @@
           inc: ->
             @bear ?= 0
             @bear++
+            true
 
         ctx.should.have.property 'bear', 2
 
@@ -47,6 +51,7 @@
           inc: ->
             @bear ?= 0
             @bear++
+            true
 
         ctx.should.have.property 'bear', 1
 
@@ -56,6 +61,7 @@
           inc: ->
             @bear ?= 0
             @bear++
+            true
 
         ctx.should.have.property 'bear', 1
 
@@ -65,6 +71,7 @@
           inc: ->
             @bear ?= 0
             @bear++
+            true
 
         ctx.should.have.property 'bear', 3
 
@@ -74,6 +81,7 @@
           inc: ->
             @bear ?= 0
             @bear++
+            true
 
         ctx.should.have.property 'bear', 3
 
@@ -83,6 +91,7 @@
           inc: ->
             @bear ?= 0
             @bear++
+            true
 
         ctx.should.have.property 'bear', 1
 

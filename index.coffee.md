@@ -87,6 +87,8 @@ Evaluate based on the presence of `params[]` or `param`.
             debug "Calling #{statement.type} (no arguments)"
             truth = yield c.call this
 
+DEPRECATED: truth should be a boolean; this will soon change to `return truth if typeof truth isnt 'boolean'`.
+
         if truth is 'over'
           return true
 
