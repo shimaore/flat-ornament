@@ -50,6 +50,24 @@
 
         ctx.should.have.property 'bear', 3
 
+      it 'should process one statement with multiple commands', seem ->
+        ctx = {}
+        yield run.call ctx, [[{type:'inc'},{type:'inc'},{type:'inc'}]],
+          inc: ->
+            @bear ?= 0
+            @bear++
+
+        ctx.should.have.property 'bear', 3
+
+      it 'should process one statement with `not` command', seem ->
+        ctx = {}
+        yield run.call ctx, [[{not:true,type:'inc'},{type:'inc'},{type:'inc'}]],
+          inc: ->
+            @bear ?= 0
+            @bear++
+
+        ctx.should.have.property 'bear', 1
+
       commands =
         one_more_cookie: -> @cookies++; true
         give_milk: (how_much) -> @milk = how_much; true
