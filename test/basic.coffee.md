@@ -41,6 +41,24 @@
 
         ctx.should.have.property 'bear', 2
 
+      it 'should process one ornament with statements as arrays', seem ->
+        ctx = {}
+        yield run.call ctx, [[['not','inc'],['inc'],['inc']]],
+          inc: ->
+            @bear ?= 0
+            @bear++
+
+        ctx.should.have.property 'bear', 1
+
+      it 'should process one statement with `not` command', seem ->
+        ctx = {}
+        yield run.call ctx, [[['not','inc'],['inc'],['inc']]],
+          inc: ->
+            @bear ?= 0
+            @bear++
+
+        ctx.should.have.property 'bear', 1
+
       it 'should process one ornament with multiple statements', seem ->
         ctx = {}
         yield run.call ctx, [[type:'inc'],[type:'inc'],[type:'inc']],

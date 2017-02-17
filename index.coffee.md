@@ -54,9 +54,14 @@ A statement might be a {type,param?,params?,not?} object, or a [('not',)type,par
           statement.params = params
 
         if statement.length?
-          statement =
-            type: statement[0]
-            params: statement[1...]
+          params = statement[..]
+          statement = {}
+          if params[0] is 'not'
+            params.shift()
+            statement.not = true
+          statement.type = params.shift()
+          statement.params = params
+
         unless statement.type?
           debug 'No command'
           return false
