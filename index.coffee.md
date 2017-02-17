@@ -42,16 +42,24 @@ Return true if a command returned `over`, indicating the remaining ornaments in 
 
       for statement in ornament
 
-A statement might be a {type,param?,params?} object, or a [type,params...] array, or a "type" string.
+A statement might be a {type,param?,params?,not?} object, or a [('not',)type,params...] array, or a "(not )type( param param …)" string.
 
         if typeof statement is 'string'
-          statement =
-            type: statement
+          params = statement.split ' '
+          statement = {}
+          if params[0] is 'not'
+            params.shift()
+            statement.not = true
+          statement.type = params.shift()
+          statement.params = params
 
         if statement.length?
           statement =
             type: statement[0]
             params: statement[1...]
+        unless statement.type?
+          debug 'No command'
+          return false
 
         c = commands[statement.type]
 

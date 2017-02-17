@@ -15,6 +15,32 @@
 
         ctx.should.have.property 'bear', 'big'
 
+      it 'should process one ornament with one statement as string', seem ->
+        ctx = {}
+        yield run.call ctx, [['1']],
+          1: ->
+            @bear = 'big'
+
+        ctx.should.have.property 'bear', 'big'
+
+      it 'should process one ornament with statements as strings', seem ->
+        ctx = {}
+        yield run.call ctx, [['not inc','inc','inc']],
+          inc: ->
+            @bear ?= 0
+            @bear++
+
+        ctx.should.have.property 'bear', 1
+
+      it 'should process one ornament with statements as strings', seem ->
+        ctx = {}
+        yield run.call ctx, [['inc','not inc','inc']],
+          inc: ->
+            @bear ?= 0
+            @bear++
+
+        ctx.should.have.property 'bear', 2
+
       it 'should process one ornament with multiple statements', seem ->
         ctx = {}
         yield run.call ctx, [[type:'inc'],[type:'inc'],[type:'inc']],
@@ -88,7 +114,7 @@
         ornaments = [
           ['if_little','one_more_cookie']
           ['if_big',['give_milk','plenty'],'over']
-          ['if_nice','one_more_cookie','one_more_cookie',['give_milk','some']]
+          ['if_nice','one_more_cookie','one_more_cookie','give_milk some']
           ['if_angry','one_more_cookie','stop','one_more_cookie',['give_milk','maybe']]
           ['pet']
         ]
@@ -116,5 +142,3 @@
         ctx.should.have.property 'cookies', 1
         ctx.should.have.property 'milk', false
         ctx.should.have.property 'pet', true
-
-
