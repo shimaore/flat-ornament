@@ -187,3 +187,22 @@
         ctx.should.have.property 'cookies', 1
         ctx.should.have.property 'milk', false
         ctx.should.have.property 'pet', true
+
+      it 'should process strings segments that look like numbers as numbers', seem ->
+        my_commands =
+          add: (value) ->
+            @value += value
+
+        my_ornaments = [
+          ['add 3']
+        ]
+        ctx = value: 4
+        yield run.call ctx, my_ornaments, my_commands
+        ctx.should.have.property 'value', 7
+
+        my_ornaments = [
+          [['add','3']]
+        ]
+        ctx = value: 4
+        yield run.call ctx, my_ornaments, my_commands
+        ctx.should.have.property 'value', '43'

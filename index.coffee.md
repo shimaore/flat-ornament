@@ -38,6 +38,11 @@ Applying `not` to an action probably won't do what you expect.
 
 Return true if a command returned `over`, indicating the remaining ornaments in the list should be skipped.
 
+    numberify = (t) ->
+      return t unless typeof t is 'string'
+      return t unless t.match /^\d+$/
+      parseInt t
+
     execute = seem (ornament,commands) ->
 
       for statement in ornament
@@ -51,7 +56,7 @@ A statement might be a {type,param?,params?,not?} object, or a [('not',)type,par
             params.shift()
             statement.not = true
           statement.type = params.shift()
-          statement.params = params
+          statement.params = params.map numberify
 
         if statement.length?
           params = statement[..]
