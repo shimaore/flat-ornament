@@ -201,6 +201,13 @@
         ctx.should.have.property 'value', 7
 
         my_ornaments = [
+          [['add',3]]
+        ]
+        ctx = value: 4
+        yield run.call ctx, my_ornaments, my_commands
+        ctx.should.have.property 'value', 7
+
+        my_ornaments = [
           [['add','3']]
         ]
         ctx = value: 4
