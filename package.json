@@ -17,7 +17,7 @@
     "mocha": "^3.0.2"
   },
   "dependencies": {
-    "debug": "^2.2.0",
-    "seem": "^2.0.0"
+    "seem": "^2.0.0",
+    "tangible": "^1.6.0"
   }
 }

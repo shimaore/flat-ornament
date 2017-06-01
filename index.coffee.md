@@ -1,6 +1,6 @@
     seem = require 'seem'
     @name = (require './package').name
-    debug = (require 'debug') @name
+    debug = (require 'tangible') @name
 
 Run
 ---
