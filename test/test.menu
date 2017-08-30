@@ -1,0 +1,27 @@
+menu 11:
+  clear_call_center_tags() and
+  clear_user_tags and
+  user_tag("K-net Particuliers Commercial") and
+  (required_skill 'France') and
+  required_skill('Particuliers') and
+  alert_info('ringtone-3') and
+  queue('Telop') and
+  send('fifo-0').
+
+menu 103:
+  clear_call_center_tags() and
+  clear_user_tags() and
+  user_tag('Swiss Pros') and
+  required_skill('Suisse') and
+  required_skill('Pros');
+
+  if in_calendars('_holidays_FR') and
+  not in_calendars('_holidays_CH_GE') then
+  queue('CH-ouvré');
+
+  alert_info('ringtone-7').
+
+menu 102:
+  Efface les indications du centre d'appel,
+  efface les indications utilisateur,
+  va au menu 43.

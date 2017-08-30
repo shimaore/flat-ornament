@@ -2,6 +2,8 @@
     @name = (require './package').name
     debug = (require 'tangible') @name
 
+    {Parser} = require './language'
+
 Run
 ---
 
@@ -11,11 +13,18 @@ If any ornament return `true`, skip the remaining ornaments in the list.
     module.exports = seem (ornaments,commands) ->
       return unless ornaments?
 
-      debug 'Processing'
+      parser = new Parser()
+      parser.yy.valid_op = commands
+
+      if typeof ornaments is 'string'
+        ornaments = parser.parse "COMPILE ORNAMENTS #{ornaments}"
+        debug 'ornament', ornaments
+
+      debug 'Processing', ornaments
 
       for ornament in ornaments
         debug 'ornament', ornament
-        over = yield do (ornament) => execute.call this, ornament, commands
+        over = yield do (ornament) => execute.call this, ornament, commands, parser
         debug 'over', over
         return if over
 
@@ -38,25 +47,19 @@ Applying `not` to an action probably won't do what you expect.
 
 Return true if a command returned `over`, indicating the remaining ornaments in the list should be skipped.
 
-    numberify = (t) ->
-      return t unless typeof t is 'string'
-      return t unless t.match /^\d+$/
-      parseInt t
+    execute = seem (ornament,commands,parser) ->
 
-    execute = seem (ornament,commands) ->
+      if typeof ornament is 'string'
+        ornament = parser.parse "COMPILE ORNAMENT #{ornament}"
+        debug 'ornament', ornament
 
       for statement in ornament
 
 A statement might be a {type,param?,params?,not?} object, or a [('not',)type,params...] array, or a "(not )type( param param …)" string.
 
         if typeof statement is 'string'
-          params = statement.split ' '
-          statement = {}
-          if params[0] is 'not'
-            params.shift()
-            statement.not = true
-          statement.type = params.shift()
-          statement.params = params.map numberify
+          statement = parser.parse "COMPILE STATEMENT #{statement}"
+          debug 'statement', statement
 
         if statement.length?
           params = statement[..]
@@ -68,7 +71,7 @@ A statement might be a {type,param?,params?,not?} object, or a [('not',)type,par
           statement.params = params
 
         unless statement.type?
-          debug 'No command'
+          debug 'No command', statement
           return false
 
         c = commands[statement.type]

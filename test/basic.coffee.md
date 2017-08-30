@@ -7,10 +7,13 @@
       it 'should process no ornaments', ->
         run.call {}, []
 
+      it 'should process no ornaments (as string)', ->
+        run.call {}, '', {}
+
       it 'should process one ornament with one statement', seem ->
         ctx = {}
-        yield run.call ctx, [[ type:'1' ]],
-          1: ->
+        yield run.call ctx, [[ type:'one' ]],
+          one: ->
             @bear = 'big'
             true
 
@@ -18,12 +21,42 @@
 
       it 'should process one ornament with one statement as string', seem ->
         ctx = {}
-        yield run.call ctx, [['1']],
-          1: ->
+        yield run.call ctx, [['one()']],
+          one: ->
             @bear = 'big'
             true
 
         ctx.should.have.property 'bear', 'big'
+
+      it 'should process one ornament as string', seem ->
+        ctx = {}
+        yield run.call ctx, ['one().'],
+          one: ->
+            @bear = 'big'
+            true
+
+        ctx.should.have.property 'bear', 'big'
+
+      it 'should process ornaments as string', seem ->
+        ctx = {}
+        yield run.call ctx, 'one().',
+          one: ->
+            @bear = 'big'
+            true
+
+        ctx.should.have.property 'bear', 'big'
+
+      it 'should process ornaments as string', seem ->
+        ctx = {}
+        yield run.call ctx, 'one(). two().',
+          one: ->
+            @bear = 'big'
+            true
+          two: ->
+            @bear += ' toe'
+            true
+
+        ctx.should.have.property 'bear', 'big toe'
 
       it 'should process one ornament with statements as strings', seem ->
         ctx = {}
@@ -159,7 +192,7 @@
         ornaments = [
           ['if_little','one_more_cookie']
           ['if_big',['give_milk','plenty'],'over']
-          ['if_nice','one_more_cookie','one_more_cookie','give_milk some']
+          ['if_nice','one_more_cookie','one_more_cookie','give_milk("some")']
           ['if_angry','one_more_cookie','stop','one_more_cookie',['give_milk','maybe']]
           ['pet']
         ]
@@ -194,7 +227,7 @@
             @value += value
 
         my_ornaments = [
-          ['add 3']
+          ['add(3)']
         ]
         ctx = value: 4
         yield run.call ctx, my_ornaments, my_commands
@@ -209,6 +242,13 @@
 
         my_ornaments = [
           [['add','3']]
+        ]
+        ctx = value: 4
+        yield run.call ctx, my_ornaments, my_commands
+        ctx.should.have.property 'value', '43'
+
+        my_ornaments = [
+          ['add("3")']
         ]
         ctx = value: 4
         yield run.call ctx, my_ornaments, my_commands
