@@ -11,7 +11,7 @@
 [0-9]+"."(?:[0-9]+)?\b  return 'FLOAT'
 [0-9]+                  return 'INTEGER'
 ["]([^"\r\n]*)["]       return 'STRING'
-[']([^"\r\n]*)[']       return 'STRING'
+[']([^'\r\n]*)[']       return 'STRING'
 [/](\d|\?|\.|\.\.|\.\.\.|…)+[/] return 'PATTERN'
 
 "menu"                  return 'MENU'

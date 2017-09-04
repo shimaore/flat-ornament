@@ -253,3 +253,18 @@
         ctx = value: 4
         yield run.call ctx, my_ornaments, my_commands
         ctx.should.have.property 'value', '43'
+
+        my_ornaments = '''
+          add("3") and add("6").
+        '''
+        ctx = value: 4
+        yield run.call ctx, my_ornaments, my_commands
+        ctx.should.have.property 'value', '436'
+
+        my_ornaments = '''
+          add('3') and add('8').
+        '''
+        ctx = value: 4
+        yield run.call ctx, my_ornaments, my_commands
+        ctx.should.have.property 'value', '438'
+
