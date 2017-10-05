@@ -19,9 +19,7 @@
     parser.yy.valid_op = commands;
     if (typeof ornaments === 'string') {
       ornaments = parser.parse("COMPILE ORNAMENTS " + ornaments);
-      debug('ornament', ornaments);
     }
-    debug('Processing', ornaments);
     for (i = 0, len = ornaments.length; i < len; i++) {
       ornament = ornaments[i];
       debug('ornament', ornament);
