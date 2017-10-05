@@ -18,9 +18,6 @@ If any ornament return `true`, skip the remaining ornaments in the list.
 
       if typeof ornaments is 'string'
         ornaments = parser.parse "COMPILE ORNAMENTS #{ornaments}"
-        debug 'ornament', ornaments
-
-      debug 'Processing', ornaments
 
       for ornament in ornaments
         debug 'ornament', ornament
