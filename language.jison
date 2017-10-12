@@ -1,7 +1,11 @@
+/* Parses flat-ornament text syntax */
+
 %lex
 
 %options flex
-%s en fr
+
+/* Non-exclusive states */
+%s en fr frcgu
 
 %%
 
@@ -27,9 +31,6 @@
 "!"                     return 'NOT'
 ":"                     return ':'
 
-[;]                     this.popState(); return 'ORNAMENT_END'
-[.]                     this.popState(); return 'ORNAMENT_END'
-
 "si"                return 'IF'
 "Si"                return 'IF'
 "if"                return 'IF'
@@ -42,6 +43,8 @@
 "Utilise"          this.begin("fr"); return 'USE'
 "Use"              this.begin("en"); return 'USE'
 "Va"               this.begin("fr"); return 'GO'
+
+"Conditions Générales d'Utilisation"  this.begin("frcgu"); return 'CGU'
 
 <fr>[Ee]"fface"     return 'CLEAR'
 <en>[Cc]"lear"      return 'CLEAR'
@@ -77,7 +80,99 @@
 <fr>"à"\s+"la"|"au"|"à"\s+"l'"              return 'TO_THE'
 <en>"to"                                    return 'TO'
 
-\w+                     return (yytext in yy.valid_op) ? 'OP' : yytext;
+<frcgu>"Les appels"                         return 'CALLS'
+<frcgu>"sur le réseau"                      return 'CALLED_ONNET'
+<frcgu>"vers les fixes"                     return 'CALLED_FIXED'
+<frcgu>"vers les mobiles"                   return 'CALLED_MOBILE'
+<frcgu>"vers les fixes et les mobiles"      return 'CALLED_FIXED_OR_MOBILE'
+<frcgu>"vers"                               return 'TOWARDS'
+<frcgu>"en"                                 return 'TOWARDS'
+<frcgu>"Appel illimités"                    return 'UNLIMITED'
+<frcgu>"dans la limite de"                  return 'ATMOST'
+<frcgu>"au plus"                            return 'ATMOST'
+<frcgu>"jusqu'à"                            return 'ATMOST'
+<frcgu>"heures"                             return 'HOURS'
+<frcgu>"mensuels"                           return 'PER_MONTH'
+<frcgu>"mensuelles"                         return 'PER_MONTH'
+<frcgu>"destinataires"                      return 'CALLEE'
+<frcgu>"différents"                         return 'DIFFERENT'
+<frcgu>"différentes"                        return 'DIFFERENT'
+<frcgu>"par mois"                           return 'PER_CYCLE'
+<frcgu>"par facture"                        return 'PER_CYCLE'
+<frcgu>"sont gratuits"                      return 'FREE'
+<frcgu>"par appel"                          return 'PER_CALL'
+<frcgu>"par jour"                           return 'PER_DAY'
+<frcgu>"par heure"                          return 'PER_HOUR'
+<frcgu>"par semaine"                        return 'PER_WEEK'
+<frcgu>"par jour de la semaine"             return 'PER_DAY_OF_WEEK'
+<frcgu>"heure"                              return 'HOURS'
+<frcgu>"heures"                             return 'HOURS'
+<frcgu>"minute"                             return 'MINUTES'
+<frcgu>"minutes"                            return 'MINUTES'
+<frcgu>"seconde"                            return 'SECONDES'
+<frcgu>"secondes"                           return 'SECONDES'
+
+<frcgu>"France métropolitaine"              return 'fr'
+<frcgu>"Allemagne"                          return 'de'
+<frcgu>"Royaume-Uni"                        return 'uk'
+<frcgu>"Argentine"                          return 'xx'
+<frcgu>"Australie"                          return 'xx'
+<frcgu>"Autriche" return 'xx'
+<frcgu>"Baléares" return 'xx'
+<frcgu>"Belgique"                              return 'be'
+<frcgu>"Brésil" return 'xx'
+<frcgu>"Canada" return 'xx'
+<frcgu>"Chili" return 'xx'
+<frcgu>"Chine" return 'xx'
+<frcgu>"Chypre" return 'xx'
+<frcgu>"Colombie" return 'xx'
+<frcgu>"Danemark" return 'xx'
+<frcgu>"Écosse" return 'xx'
+<frcgu>"Espagne" return 'xx'
+<frcgu>"Estonie" return 'xx'
+<frcgu>"France métropolitaine" return 'xx'
+<frcgu>"Grèce" return 'xx'
+<frcgu>"Guam" return 'xx'
+<frcgu>"Hong-Kong" return 'xx'
+<frcgu>"Hongrie" return 'xx'
+<frcgu>"Iles Vierges (U.S.)" return 'xx'
+<frcgu>"Islande" return 'xx'
+<frcgu>"Irlande" return 'xx'
+<frcgu>"Irlande du Nord" return 'xx'
+<frcgu>"Israël" return 'xx'
+<frcgu>"Italie" return 'xx'
+<frcgu>"Kazakhstan" return 'xx'
+<frcgu>"Lettonie" return 'xx'
+<frcgu>"Luxembourg" return 'xx'
+<frcgu>"Malaisie" return 'xx'
+<frcgu>"Mexique" return 'xx'
+<frcgu>"Norvège" return 'xx'
+<frcgu>"Nouvelle Zélande" return 'xx'
+<frcgu>"Panama" return 'xx'
+<frcgu>"Pays Bas" return 'xx'
+<frcgu>"Pays de Galles" return 'xx'
+<frcgu>"Pologne" return 'xx'
+<frcgu>"Portugal" return 'xx'
+<frcgu>"Pérou" return 'xx'
+<frcgu>"Russie" return 'xx'
+<frcgu>"Singapour" return 'xx'
+<frcgu>"Slovaquie" return 'xx'
+<frcgu>"Suisse"                 return 'ch'
+<frcgu>"Suède" return 'xx'
+<frcgu>"Taïwan" return 'xx'
+<frcgu>"Thaïlande" return 'xx'
+<frcgu>"USA"                    return 'us'
+<frcgu>"Vatican" return 'xx'
+
+<frcgu>[;]                      return ';'
+<frcgu>[,]                      /* ignore */
+<frcgu>[.]                      return '.'
+<frcgu>[\w-]+                      return 'NAME'
+
+[;]                     this.popState(); return ';'
+[.]                     this.popState(); return '.'
+
+\w+                     return (yy.valid_op && yytext in yy.valid_op) ? 'OP' : yytext;
 
 <<EOF>>                 return 'EOF'
 
@@ -85,7 +180,9 @@
 .                       return yytext
 /lex
 
-%%
+/* operator association and precedence, if any */
+
+%% /* grammar */
 
 start
   : menus EOF                           { return $1 }
@@ -94,6 +191,7 @@ start
   | COMPILE STATEMENT c_statement EOF   { return $3 }
   | COMPILE STATEMENT fr_statement EOF  { return $3 }
   | COMPILE STATEMENT en_statement EOF  { return $3 }
+  | CGU fr_cgu EOF                      { return $2 }
   ;
 
 menus
@@ -115,12 +213,12 @@ ornaments
   ;
 
 ornament
-  : c_ornament ORNAMENT_END -> $1
-  | fr_ornament ORNAMENT_END -> $1
-  | en_ornament ORNAMENT_END -> $1
-  | IF c_ornament THEN c_ornament ORNAMENT_END -> $2.concat([$4])
-  | IF fr_ornament THEN fr_ornament ORNAMENT_END -> $2.concat([$4])
-  | IF en_ornament THEN en_ornament ORNAMENT_END -> $2.concat([$4])
+  : c_ornament ';' -> $1
+  | c_ornament '.' -> $1
+  | fr_ornament '.' -> $1
+  | en_ornament '.' -> $1
+  | IF c_ornament THEN c_ornament ';' -> $2.concat([$4])
+  | IF c_ornament THEN c_ornament '.' -> $2.concat([$4])
   ;
 
 c_ornament
@@ -194,6 +292,7 @@ fr_command
   | CLEAR THE TAGS USER -> {type:'clear_user_tags'}
   | GO TO_THE MENU integer -> {type:'goto_menu',params:[$4]}
   | EXECUTE operation -> $2
+
   ;
 
 en_statement
@@ -202,4 +301,87 @@ en_statement
 
 en_command
   : CLEAR CALL_CENTER TAGS  -> {type:'clear_call_center_tags'}
+  ;
+
+fr_cgu
+  : fr_cgu fr_cgu_sentence -> $1.concat([$2])
+  | -> /* hide_emergency */ [[{type:'called_emergency'}, {type:'hide_call'}, {type:'stop'}]]
+  ;
+
+fr_cgu_sentence
+  : sentence '.' -> [{type:'reset_up_to'}].concat($1,[{type:'stop'}])
+  ;
+
+sentence
+  : CALLS conditions outcomes -> $2.concat($3)
+  | CALLS conditions outcomes conditions -> $2.concat($4, $3)
+  | CALLS outcomes conditions -> $3.concat($2)
+  ;
+
+conditions
+  : conditions condition -> $1.concat($2)
+  | condition -> $1
+  ;
+
+outcomes
+  : outcomes outcome -> $1.concat($2)
+  | outcome -> $1
+  ;
+
+condition
+  : CALLED_ONNET            -> [{type:'called_onnet'}]
+  | CALLED_ONNET NAME       -> [{type:'called_onnet'}]
+  | CALLED_FIXED            -> [{type:'called_fixed'}]
+  | CALLED_FIXED_OR_MOBILE  -> [{type:'called_fixed_or_mobile'}]
+  | CALLED_MOBILE           -> [{type:'called_mobile'}]
+  | TOWARDS countries       -> [{type:'called_country',param:$2}]
+  | ATMOST callees                 -> name = yy.new_name(); $$ = [{type:'count_called',param:name},          {type:'at_most',params:[$2,name]}]
+  | ATMOST callees name            -> name = 'callee_'+$3;  $$ = [{type:'count_called',param:name},          {type:'at_most',params:[$2,name]}]
+  | ATMOST callees name PER_CYCLE  -> name = 'callee_'+$3;  $$ = [{type:'count_called',param:name},          {type:'at_most',params:[$2,name]}]
+  | ATMOST callees period          -> name = yy.new_name(); $$ = [{type:'count_called_per',params:[name,$3]},{type:'at_most',params:[$2,name]}]
+  | ATMOST callees name period     -> name = 'callee_'+$3;  $$ = [{type:'count_called_per',params:[name,$4]},{type:'at_most_per',params:[$2,name,$4]}]
+  | ATMOST duration PER_CALL       ->                       $$ = [{type:'per_call_up_to',param:$2}]
+  | ATMOST duration PER_CYCLE      -> name = yy.new_name(); $$ = [{type:'increment_duration',param:name},{type:'up_to',params:[$2,name]}]
+  | ATMOST duration name PER_CYCLE -> name = $3;            $$ = [{type:'increment_duration',param:name},{type:'up_to',params:[$2,name]}]
+  | ATMOST duration name period    -> name = $3;            $$ = [{type:'increment_duration_per',params:[name,$4]},{type:'up_to_per',params:[$2,name,$4]}]
+  ;
+
+name
+  : NAME -> yytext
+  ;
+
+callees
+  : integer CALLEE -> $1
+  ;
+
+duration
+  : integer time_unit -> $1 * $2
+  ;
+
+period
+  : PER_DAY       -> 'day'
+  | PER_HOUR      -> 'hour'
+  | PER_WEEK      -> 'week'
+  | DAY_OF_WEEK   -> 'day-of-week'
+  ;
+
+time_unit
+  : SECONDS -> 1
+  | MINUTES -> 60
+  | HOURS   -> 3600
+  ;
+
+countries
+  : countries ',' country -> $1.concat([$3])
+  | country -> [$1]
+  ;
+
+country
+  : fr -> 'fr'
+  | be -> 'be'
+  | ch -> 'ch'
+  ;
+
+outcome
+  : FREE -> [{type:'free'}]
   ;

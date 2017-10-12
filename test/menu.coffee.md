@@ -14,3 +14,13 @@
           in_calendars: true
         text = fs.readFileSync './test/test.menu', encoding:'utf8'
         (require 'assert') parser.parse text
+
+    describe 'The CGU', ->
+      it 'should compile', ->
+        {Parser} = require '../language'
+        parser = new Parser()
+        name = 0
+        parser.yy.new_name = -> "name#{name++}"
+        text = fs.readFileSync './test/new-cgu-knet.txt', encoding:'utf8'
+        (require 'assert') parser.parse text
+        console.log JSON.stringify (parser.parse text), null, '  '
