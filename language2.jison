@@ -9,6 +9,8 @@ STRING2     ["]([^"\r\n]*)["]
 PATTERN     [/](\d|\?|\.|\.\.|\.\.\.|…)+[/]
 NAME        [A-Za-z][\w-]+
 
+%token OP NAME
+
 %options flex
 
 /* Exclusive states */
@@ -22,12 +24,21 @@ NAME        [A-Za-z][\w-]+
 \s+             /* skip */
 
 "if"            return 'IF'
+"it"            return 'IT'
+"unless"        return 'UNLESS'
 "then"          return 'THEN'
 "else"          return 'ELSE'
-"it"            return 'IT'
 "and"           return 'AND'
 "or"            return 'OR'
 "not"           return 'NOT'
+"is"            return 'IS'
+"true"          return 'TRUE'
+"false"         return 'FALSE'
+"greater"       return 'GREATER'
+"smaller"       return 'SMALLER'
+"than"          return 'THAN'
+"the"           return 'THE'
+"of"            return 'OF'
 
 {FLOAT}         return 'FLOAT'
 {INTEGER}       return 'INTEGER'
@@ -36,96 +47,78 @@ NAME        [A-Za-z][\w-]+
 {PATTERN}       return 'PATTERN'
 {NAME}          return (yy.valid_op && yytext in yy.valid_op) ? 'OP' : 'NAME'
 
-<<EOF>>                 return 'EOF'
-.                       return yytext
+<<EOF>>         return 'EOF'
+.               return yytext
 
 /lex
 
 /* operator association and precedence, if any */
 
+%right IF UNLESS
+%left THEN ELSE
 %left AND
 %left OR
 %left NOT
+%left '<' '>' IS
 %left '+' '-'
 %left '*' '/'
 %left '^'
 %right '!'
 %right '%'
+%left '['
 %left UMINUS
+%left OF
 
 %% /* grammar */
 
 start
-  : expressions -> $1(Immutable.Map()) /* evaluate */
+  : expressions EOF  { return $1(yy.Immutable.Map()) /* evaluate */ }
+  |                  { return }
   ;
 
 expressions
-  : expressions expression -> (ctx) => it = await $1(ctx); await $2(ctx.set('it', it))
-  | -> (ctx) => undefined
+  : assignment ',' expressions                    -> async function (ctx) { var ctx = await $1(ctx); return $3(ctx); }
+  | expression ',' expressions                  -> async function (ctx) { var it = await $1(ctx); return $3(ctx.set('it', it)); }
+  | expression -> $1
+  | '{' expressions '}' -> $2
+  ;
+
+assignment
+  : name '=' expression  -> async function (ctx) { var name = $1; var val = await $3(ctx); return ctx.set(name,val); }
   ;
 
 expression
-  : NAME '=' expression expressions -> name = $1; (ctx) => $4(ctx.set(name,await $2(ctx)))
-  | IT -> (ctx) => ctx.get('it')
-  | NAME -> name = $1; (ctx) => ctx.get(name)
-  | number
-  | boolean
-  ;
-
-boolean
-  : NOT boolean -> (ctx) => ! $2(ctx)
-  | boolean AND boolean -> (ctx) => $1(ctx) && $3(ctx)
-  | boolean OR boolean -> (ctx) => $1(ctx) && $3(ctx)
-  | boolean_constant -> (ctx) => $1
-  | operation -> [name,args] = $1; fun = yy.valid_op[name]; (ctx) => fun.call this, args.map (a) => await a(ctx)
-  ;
-
-boolean_constant
-  : true -> true
-  | false -> false
-  ;
-
-true
-  : TRUE
-  | NOT false
-  | true OR boolean
-  | boolean OR true
-  ;
-
-false
-  : FALSE
-  | NOT true
-  | false AND boolean
-  | boolean AND false
-  ;
-
-numerical
-  : number -> (ctx) => $1
-  | numerical '+' numerical -> (ctx) => $1(ctx) + $3(ctx)
-  | numerical '*' numerical -> (ctx) => $1(ctx) * $3(ctx)
-  | numerical '-' numerical -> (ctx) => $1(ctx) - $3(ctx)
-  | '-' numerical -> () => - $2(ctx) %prec UMINUS
-  | '(' numerical ')' -> $2
-  ;
-
-/* constants */
-number
-  : float -> $1
-  | integer -> $1
-  | number '+' number -> $1 + $3
-  | number '*' number -> $1 + $3
-  | number '-' number -> $1 - $3
-  | '-' number -> - $2 %prec UMINUS
-  | '(' number ')' -> $2
-  ;
-
-
-operation
-  : OP '(' parameters ')'   -> [$1,$3]
-  | OP '(' ')'              -> [$1,[]]
-  | '(' OP ')'              -> [$1,[]]
-  | '(' OP parameters ')'   -> [$2,$3]
-  | OP                      -> [$1]
+  : IT                            -> function (ctx) { return ctx.get('it') }
+  | name                          -> function (ctx) { return ctx.get($1) }
+  | float                         -> function (ctx) { return $1 }
+  | integer                       -> function (ctx) { return $1 }
+  | string                        -> function (ctx) { return $1 }
+  | TRUE                          -> function (ctx) { return true }
+  | FALSE                         -> function (ctx) { return false }
+  | expression AND expression     -> async function (ctx) { var cond = await $1(ctx); return cond && $3(ctx) }
+  | expression OR  expression     -> async function (ctx) { var cond = await $1(ctx); return cond || $3(ctx) }
+  | NOT expression                -> async function (ctx) { return ! await $2(ctx) }
+  | expression '+' expression     -> async function (ctx) { var a = await $1(ctx); return a + await $3(ctx) }
+  | expression '*' expression     -> async function (ctx) { var a = await $1(ctx); return a * await $3(ctx) }
+  | expression '-' expression     -> async function (ctx) { var a = await $1(ctx); return a - await $3(ctx) }
+  | expression '>' expression     -> async function (ctx) { var a = await $1(ctx); return a > await $3(ctx) }
+  | expression IS GREATER THAN expression -> async function (ctx) { var a = await $1(ctx); return a > await $5(ctx) }
+  | expression '<' expression     -> async function (ctx) { var a = await $1(ctx); return a < await $3(ctx) }
+  | expression IS SMALLER THAN expression -> async function (ctx) { var a = await $1(ctx); return a < await $5(ctx) }
+  | expression IS  expression     -> async function (ctx) { var a = await $1(ctx); return a === await $3(ctx) }
+  | THE name OF expression        -> async function (ctx) { var a = await $4(ctx); if (a.hasOwnProperty($2)) { return a[$2] }; if ($2 === 'length') { return a.length } }
+  | expression '[' integer ']'    -> async function (ctx) { var a = await $1(ctx); if (a.hasOwnProperty($3)) { return a[$3] }; }
+  | '-' expression  %prec UMINUS  -> async function (ctx) { return - await $2(ctx) }
+  | op '(' parameters ')'         -> async function (ctx) { var args = await Promise.all($3.map( (a) => a(ctx) )); return $1(...args); }
+  | op '(' ')'                    -> function (ctx) { return $1(); }
+  | op                            -> function (ctx) { return $1(); }
+  | IF expression THEN expression                 -> async function (ctx) { var cond = await $2(ctx); if (cond) return $4(ctx); }
+  | expression IF expression                      -> async function (ctx) { var cond = await $3(ctx); if (cond) return $1(ctx); }
+  | expression UNLESS expression                  -> async function (ctx) { var cond = await $3(ctx); if (!cond) return $1(ctx); }
+  | IF expression THEN expression ELSE expression -> async function (ctx) { var cond = await $2(ctx); if (cond) { return $4(ctx) } else { return $6(ctx) } }
+  | '(' expression ')'            -> $2
+  | '[' parameters ']'            -> async function (ctx) { return await Promise.all($2.map( (a) => a(ctx) )); }
+  // | condition
   ;
 
 parameters
@@ -170,9 +163,13 @@ string
   ;
 
 pattern
-  : PATTERN   -> yytext.substr(1,yytext.length-2)
+  : PATTERN   -> new RegExp(yytext.substr(1,yytext.length-2))
   ;
 
 name
   : NAME      -> yytext
+  ;
+
+op
+  : OP        -> yy.valid_op[yytext]
   ;
