@@ -2,83 +2,65 @@
 
 %lex
 
+FLOAT       [0-9]+"."(?:[0-9]+)?\b
+INTEGER     [0-9]+
+STRING1     [']([^'\r\n]*)[']
+STRING2     ["]([^"\r\n]*)["]
+PATTERN     [/](\d|\?|\.|\.\.|\.\.\.|…)+[/]
+NAME        [A-Za-z][\w-]+
+
 %options flex
 
 /* Non-exclusive states */
-%s en fr frcgu
+/* %s none */
+/* Exclusive states */
+%x simple frcgu
 
 %%
 
+
+/* INITIAL */
+
 "#"[^\r\n]*?[\r\n]      /* hash comments */
-\s+                     /* skip whitespace */
+"menu"                  this.begin('simple'); return 'MENU'
+"ornaments"             this.begin('simple'); return 'ORNAMENTS'
+"ornament"              this.begin('simple'); return 'ORNAMENT'
+"statement"             this.begin('simple'); return 'STATEMENT'
+<<EOF>>                 return 'EOF'
+.                       return yytext
 
-[0-9]+"."(?:[0-9]+)?\b  return 'FLOAT'
-[0-9]+                  return 'INTEGER'
-["]([^"\r\n]*)["]       return 'STRING'
-[']([^'\r\n]*)[']       return 'STRING'
-[/](\d|\?|\.|\.\.|\.\.\.|…)+[/] return 'PATTERN'
+/* simple */
 
-"menu"                  return 'MENU'
+<simple>"menu"      return 'MENU'
 
-"and"                   return 'AND'
-"&&"                    return 'AND'
+<simple>"if"        return 'IF'
+<simple>"then"      return 'THEN'
 
-"("                     return '('
-")"                     return ')'
-"["                     return '['
-"]"                     return ']'
-"not"                   return 'NOT'
-"!"                     return 'NOT'
-":"                     return ':'
+<simple>"and"       return 'AND'
+<simple>"&&"        return 'AND'
 
-"si"                return 'IF'
-"Si"                return 'IF'
-"if"                return 'IF'
-"If"                return 'IF'
-"alors"             return 'THEN'
-"then"              return 'THEN'
+<simple>"not"       return 'NOT'
+<simple>"!"         return 'NOT'
 
-"Efface"           this.begin("fr"); return 'CLEAR'
-"Clear"            this.begin("en"); return 'CLEAR'
-"Utilise"          this.begin("fr"); return 'USE'
-"Use"              this.begin("en"); return 'USE'
-"Va"               this.begin("fr"); return 'GO'
+<simple>"end"       return 'END'
+<simple>";"         return 'END'
+<simple>"."         return 'END'
+
+<simple>{FLOAT}     return 'FLOAT'
+<simple>{INTEGER}   return 'INTEGER'
+<simple>{STRING1}   return 'STRING'
+<simple>{STRING2}   return 'STRING'
+<simple>{PATTERN}   return 'PATTERN'
+
+<simple>\w+         return (yy.valid_op && yytext in yy.valid_op) ? 'OP' : 'NAME';
+
+<simple>\s+         /* skip whitespace */
+<simple><<EOF>>     return 'EOF'
+<simple>.           return yytext
+
+/* frcgu */
 
 "Conditions Générales d'Utilisation"  this.begin("frcgu"); return 'CGU'
-
-<fr>[Ee]"fface"     return 'CLEAR'
-<en>[Cc]"lear"      return 'CLEAR'
-<fr>[Uu]"tilise"    return 'USE'
-<en>[Uu]"se"        return 'USE'
-<fr>[Vv]"a"         return 'GO'
-
-<fr>"indications"              return 'TAGS'
-<en>"tags"                     return 'TAGS'
-<fr>"centre"\s+"d'appel"       return 'CALL_CENTER'
-<en>"call-center"              return 'CALL_CENTER'
-<fr>"utilisateur"              return 'USER'
-<en>"user"                     return 'USER'
-<fr>"finir"                    return 'STOP'
-<fr>"sonnerie"                 return 'RINGER'
-<fr>"appel"                    return 'CALL'
-<en>"call"                     return 'CALL'
-
-<en>"anonymous"                return 'ANONYMOUS'
-<fr>"anonyme"                  return 'ANONYMOUS'
-
-<en>"the"                                   return 'THE'
-<fr>"le" return 'THE'
-<fr>"la" return 'THE'
-<fr>"l'" return 'THE'
-<fr>"les" return 'THE'
-<en>"of"                                    return 'OF'
-<fr>"du"|"de"\s+"la"|"des"|"de"\s+"l'"      return 'OF_THE'
-<fr>"pour"                                  return 'FOR'
-<en>"for"                                   return 'FOR'
-<en>"a"|"an"|"some"                         return 'SOME'
-<fr>"un"|"une"|"des"                        return 'SOME'
-<fr>"à"\s+"la"|"au"|"à"\s+"l'"              return 'TO_THE'
-<en>"to"                                    return 'TO'
 
 <frcgu>"Les appels"                         return 'CALLS'
 <frcgu>"sur le réseau"                      return 'CALLED_ONNET'
@@ -112,14 +94,14 @@
 <frcgu>"seconde"                            return 'SECONDES'
 <frcgu>"secondes"                           return 'SECONDES'
 
-<frcgu>"France métropolitaine"              return 'fr'
-<frcgu>"Allemagne"                          return 'de'
-<frcgu>"Royaume-Uni"                        return 'uk'
-<frcgu>"Argentine"                          return 'xx'
-<frcgu>"Australie"                          return 'xx'
+<frcgu>"France métropolitaine"              yytext = 'fr'; return 'COUNTRY'
+<frcgu>"Allemagne"                          yytext = 'de'; return 'COUNTRY'
+<frcgu>"Royaume-Uni"                        yytext = 'uk'; return 'COUNTRY'
+<frcgu>"Argentine"                          return 'COUNTRY'
+<frcgu>"Australie"                          return 'COUNTRY'
 <frcgu>"Autriche" return 'xx'
 <frcgu>"Baléares" return 'xx'
-<frcgu>"Belgique"                              return 'be'
+<frcgu>"Belgique"                           yytext = 'be'; return 'COUNTRY'
 <frcgu>"Brésil" return 'xx'
 <frcgu>"Canada" return 'xx'
 <frcgu>"Chili" return 'xx'
@@ -157,27 +139,21 @@
 <frcgu>"Russie" return 'xx'
 <frcgu>"Singapour" return 'xx'
 <frcgu>"Slovaquie" return 'xx'
-<frcgu>"Suisse"                 return 'ch'
+<frcgu>"Suisse"                               yytext = 'ch'; return 'COUNTRY'
 <frcgu>"Suède" return 'xx'
 <frcgu>"Taïwan" return 'xx'
 <frcgu>"Thaïlande" return 'xx'
 <frcgu>"USA"                    return 'us'
 <frcgu>"Vatican" return 'xx'
 
-<frcgu>[;]                      return ';'
-<frcgu>[,]                      /* ignore */
-<frcgu>[.]                      return '.'
-<frcgu>[\w-]+                      return 'NAME'
+<frcgu>[,]          /* ignore */
+<frcgu>{INTEGER}    return 'INTEGER'
+<frcgu>{NAME}       return 'NAME'
 
-[;]                     this.popState(); return ';'
-[.]                     this.popState(); return '.'
+<frcgu>\s+          /* skip whitespace */
+<frcgu><<EOF>>     return 'EOF'
+<frcgu>.           return yytext
 
-\w+                     return (yy.valid_op && yytext in yy.valid_op) ? 'OP' : yytext;
-
-<<EOF>>                 return 'EOF'
-
-"{".*"}"                return 'JSON'
-.                       return yytext
 /lex
 
 /* operator association and precedence, if any */
@@ -186,11 +162,9 @@
 
 start
   : menus EOF                           { return $1 }
-  | COMPILE ORNAMENTS ornaments EOF     { return $3 }
-  | COMPILE ORNAMENT ornament EOF       { return $3 }
-  | COMPILE STATEMENT c_statement EOF   { return $3 }
-  | COMPILE STATEMENT fr_statement EOF  { return $3 }
-  | COMPILE STATEMENT en_statement EOF  { return $3 }
+  | ORNAMENTS ornaments   EOF           { return $2 }
+  | ORNAMENT  ornament    EOF           { return $2 }
+  | STATEMENT c_statement EOF           { return $2 }
   | CGU fr_cgu EOF                      { return $2 }
   ;
 
@@ -213,28 +187,14 @@ ornaments
   ;
 
 ornament
-  : c_ornament ';' -> $1
-  | c_ornament '.' -> $1
-  | fr_ornament '.' -> $1
-  | en_ornament '.' -> $1
-  | IF c_ornament THEN c_ornament ';' -> $2.concat([$4])
-  | IF c_ornament THEN c_ornament '.' -> $2.concat([$4])
+  : c_ornament END -> $1
+  | IF c_ornament THEN c_ornament END -> $2.concat([$4])
   ;
 
 c_ornament
   : c_ornament AND c_statement      -> $1.concat([$3])
   | c_ornament ',' c_statement      -> $1.concat([$3])
   | c_statement                     -> [$1]
-  ;
-
-fr_ornament
-  : fr_ornament ',' fr_statement    -> $1.concat([$3])
-  | fr_statement                    -> [$1]
-  ;
-
-en_ornament
-  : en_ornament ',' en_statement    -> $1.concat([$3])
-  | en_statement                    -> [$1]
   ;
 
 c_statement
@@ -266,43 +226,6 @@ parameter
   | pattern -> $1
   ;
 
-integer
-  : INTEGER   -> parseInt(yytext,10)
-  ;
-
-float
-  : FLOAT     -> parseFloat(yytext)
-  ;
-
-string
-  : STRING    -> yytext.substr(1,yytext.length-2)
-  ;
-
-pattern
-  : PATTERN   -> yytext.substr(1,yytext.length-2)
-  ;
-
-fr_statement
-  : fr_command -> $1
-  ;
-
-fr_command
-  : CLEAR THE TAGS OF_THE CALL_CENTER -> {type:'clear_call_center_tags'}
-  | CLEAR THE TAGS OF_THE USER -> {type:'clear_user_tags'}
-  | CLEAR THE TAGS USER -> {type:'clear_user_tags'}
-  | GO TO_THE MENU integer -> {type:'goto_menu',params:[$4]}
-  | EXECUTE operation -> $2
-
-  ;
-
-en_statement
-  : en_command -> $1
-  ;
-
-en_command
-  : CLEAR CALL_CENTER TAGS  -> {type:'clear_call_center_tags'}
-  ;
-
 fr_cgu
   : fr_cgu fr_cgu_sentence -> $1.concat([$2])
   | -> /* hide_emergency */ [[{type:'called_emergency'}, {type:'hide_call'}, {type:'stop'}]]
@@ -330,7 +253,7 @@ outcomes
 
 condition
   : CALLED_ONNET            -> [{type:'called_onnet'}]
-  | CALLED_ONNET NAME       -> [{type:'called_onnet'}]
+  | CALLED_ONNET NAME       -> [{type:'called_onnet'}] /* "sur le réseau K-net" */
   | CALLED_FIXED            -> [{type:'called_fixed'}]
   | CALLED_FIXED_OR_MOBILE  -> [{type:'called_fixed_or_mobile'}]
   | CALLED_MOBILE           -> [{type:'called_mobile'}]
@@ -344,10 +267,6 @@ condition
   | ATMOST duration PER_CYCLE      -> name = yy.new_name(); $$ = [{type:'increment_duration',param:name},{type:'up_to',params:[$2,name]}]
   | ATMOST duration name PER_CYCLE -> name = $3;            $$ = [{type:'increment_duration',param:name},{type:'up_to',params:[$2,name]}]
   | ATMOST duration name period    -> name = $3;            $$ = [{type:'increment_duration_per',params:[name,$4]},{type:'up_to_per',params:[$2,name,$4]}]
-  ;
-
-name
-  : NAME -> yytext
   ;
 
 callees
@@ -372,16 +291,36 @@ time_unit
   ;
 
 countries
-  : countries ',' country -> $1.concat([$3])
-  | country -> [$1]
+  : countries ',' country -> $$ = $1.concat([$3])
+  | country               -> $$ = [$1]
   ;
 
 country
-  : fr -> 'fr'
-  | be -> 'be'
-  | ch -> 'ch'
+  : COUNTRY -> yytext
   ;
 
 outcome
   : FREE -> [{type:'free'}]
+  ;
+
+/* Constants */
+
+integer
+  : INTEGER   -> parseInt(yytext,10)
+  ;
+
+float
+  : FLOAT     -> parseFloat(yytext)
+  ;
+
+string
+  : STRING    -> yytext.substr(1,yytext.length-2)
+  ;
+
+pattern
+  : PATTERN   -> yytext.substr(1,yytext.length-2)
+  ;
+
+name
+  : NAME      -> yytext
   ;

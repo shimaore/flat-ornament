@@ -12,6 +12,7 @@
           queue: true
           send: true
           in_calendars: true
+          goto_menu: true
         text = fs.readFileSync './test/test.menu', encoding:'utf8'
         (require 'assert') parser.parse text
 

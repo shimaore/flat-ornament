@@ -22,6 +22,6 @@ menu 103:
   alert_info('ringtone-7').
 
 menu 102:
-  Efface les indications du centre d'appel,
-  efface les indications utilisateur,
-  va au menu 43.
+  clear_call_center_tags,
+  clear_user_tags,
+  goto_menu(43).

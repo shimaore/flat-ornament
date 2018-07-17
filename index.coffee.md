@@ -1,4 +1,3 @@
-    seem = require 'seem'
     @name = (require './package').name
     debug = (require 'tangible') @name
 
@@ -10,18 +9,18 @@ Run
 Parameter: an array of individual ornaments which are executed in the order of the array.
 If any ornament return `true`, skip the remaining ornaments in the list.
 
-    module.exports = seem (ornaments,commands) ->
+    module.exports = (ornaments,commands) ->
       return unless ornaments?
 
       parser = new Parser()
       parser.yy.valid_op = commands
 
       if typeof ornaments is 'string'
-        ornaments = parser.parse "COMPILE ORNAMENTS #{ornaments}"
+        ornaments = parser.parse "ornaments #{ornaments}"
 
       for ornament in ornaments
         debug 'ornament', ornament
-        over = yield do (ornament) => execute.call this, ornament, commands, parser
+        over = await do (ornament) => execute.call this, ornament, commands, parser
         debug 'over', over
         return if over
 
@@ -44,18 +43,19 @@ Applying `not` to an action probably won't do what you expect.
 
 Return true if a command returned `over`, indicating the remaining ornaments in the list should be skipped.
 
-    execute = seem (ornament,commands,parser) ->
+    execute = (ornament,commands,parser) ->
 
       if typeof ornament is 'string'
-        ornament = parser.parse "COMPILE ORNAMENT #{ornament}"
+        ornament = parser.parse "ornament #{ornament}"
         debug 'ornament', ornament
 
       for statement in ornament
 
-A statement might be a {type,param?,params?,not?} object, or a [('not',)type,params...] array, or a "(not )type( param param …)" string.
+A statement might be a `{type,param?,params?,not?}` object, or a `[('not',)type,params...]` array, or a `"(not )type( param param …)"` string.
+All statements are converted to `{type,param?,params?,not}` for evaluation.
 
         if typeof statement is 'string'
-          statement = parser.parse "COMPILE STATEMENT #{statement}"
+          statement = parser.parse "statement #{statement}"
           debug 'statement', statement
 
         if statement.length?
@@ -84,13 +84,13 @@ Evaluate based on the presence of `params[]` or `param`.
         switch
           when statement.params?
             debug "Calling #{statement.type}", statement.params
-            truth = yield c.apply this, statement.params
+            truth = await c.apply this, statement.params
           when statement.param?
             debug "Calling #{statement.type}", statement.param
-            truth = yield c.call this, statement.param
+            truth = await c.call this, statement.param
           else
             debug "Calling #{statement.type} (no arguments)"
-            truth = yield c.call this
+            truth = await c.call this
 
 DEPRECATED: truth should be a boolean; this will soon change to `return truth if typeof truth isnt 'boolean'`.
 
