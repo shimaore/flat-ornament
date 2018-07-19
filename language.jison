@@ -52,7 +52,7 @@ NAME        [A-Za-z][\w-]+
 <simple>{STRING2}   return 'STRING'
 <simple>{PATTERN}   return 'PATTERN'
 
-<simple>\w+         return (yy.valid_op && yytext in yy.valid_op) ? 'OP' : 'NAME';
+<simple>\w+         return (yy.op && yytext in yy.op) ? 'OP' : 'NAME';
 
 <simple>\s+         /* skip whitespace */
 <simple><<EOF>>     return 'EOF'
@@ -71,6 +71,8 @@ start
   | STATEMENT c_statement EOF           { return $2 }
   ;
 
+/* Menus build an object */
+
 menus
   : menus menu    -> $1; $$[$2[0]] = $2[1]
   |               -> {}
@@ -84,20 +86,22 @@ menu_label
   : MENU INTEGER    ->  $2
   ;
 
+/* Ornaments are async functions */
+
 ornaments
-  : ornaments ornament -> $1.concat([$2])
-  |  -> []
+  : ornaments ornament -> async function () { if ('over' !== await $1.call(this)) { return await $2.call(this) } }
+  |  -> yy.NOTHING
   ;
 
 ornament
   : c_ornament END -> $1
-  | IF c_ornament THEN c_ornament END -> $2.concat([$4])
+  | IF c_ornament THEN c_ornament END -> async function() { return (await $2.call(this)) ? await $4.call(this) : yy.NOTHING }
   ;
 
 c_ornament
-  : c_ornament AND c_statement      -> $1.concat([$3])
-  | c_ornament ',' c_statement      -> $1.concat([$3])
-  | c_statement                     -> [$1]
+  : c_ornament AND c_statement      -> async function() { return (await $1.call(this)) ? await $3.call(this) : yy.NOTHING }
+  | c_ornament ',' c_statement      -> async function() { return (await $1.call(this)) ? await $3.call(this) : yy.NOTHING }
+  | c_statement                     -> $1
   ;
 
 c_statement
@@ -105,16 +109,16 @@ c_statement
   ;
 
 command
-  : NOT operation   -> $2; $$.not = true
+  : NOT operation   -> async function () { return !await $2.call(this) }
   | operation       -> $1
   ;
 
 operation
-  : OP '(' parameters ')'   -> {type:$1,params:$3}
-  | OP '(' ')'              -> {type:$1}
-  | '(' OP ')'              -> {type:$2}
-  | '(' OP parameters ')'   -> {type:$2,params:$3}
-  | OP                      -> {type:$1}
+  : op '(' parameters ')'   -> async function () { return $1.apply(this,$3) }
+  | op '(' ')'              -> async function () { return $1.call(this) }
+  | '(' op ')'              -> async function () { return $2.call(this) }
+  | '(' op parameters ')'   -> async function () { return $2.apply(this,$3) }
+  | op                      -> async function () { return $1.call(this) }
   ;
 
 parameters
@@ -149,4 +153,8 @@ pattern
 
 name
   : NAME      -> yytext
+  ;
+
+op
+  : OP        -> yy.op[yytext]
   ;

@@ -3,31 +3,37 @@
 
     {Parser} = require './language'
 
-Run
----
+    NOTHING = ->
+    NOT = (x) -> not x
+    ID = (x) -> x
 
-Parameter: an array of individual ornaments which are executed in the order of the array.
-If any ornament return `true`, skip the remaining ornaments in the list.
+    parser = (commands) ->
 
-    module.exports = (ornaments,commands) ->
-      return unless ornaments?
+      p = new Parser()
+      p.yy.op = commands
+      p.yy.NOTHING = NOTHING
+      p.yy.NOT = NOT
+      p.yy.ID = ID
+      p
 
-      parser = new Parser()
-      parser.yy.valid_op = commands
+    compile = (ornaments,commands,parser) ->
 
-      if typeof ornaments is 'string'
-        ornaments = parser.parse "ornaments #{ornaments}"
+      switch
+        when typeof ornaments is 'string'
+          parser.parse "ornaments #{ornaments}"
 
-      for ornament in ornaments
-        debug 'ornament', ornament
-        over = await do (ornament) => execute.call this, ornament, commands, parser
-        debug 'over', over
-        return if over
+        when ornaments.length?
 
-      return
+          structure = ornaments.map (ornament) ->
+            compile_ornament ornament,commands,parser
 
-Execute
--------
+          ->
+            for ornament in structure
+              if await ornament.call this
+                return
+
+        else
+          NOTHING
 
 Each ornament is a list of statements which are executed in order.
 
@@ -43,66 +49,88 @@ Applying `not` to an action probably won't do what you expect.
 
 Return true if a command returned `over`, indicating the remaining ornaments in the list should be skipped.
 
-    execute = (ornament,commands,parser) ->
+    compile_ornament = (ornament,commands,parser) ->
 
-      if typeof ornament is 'string'
-        ornament = parser.parse "ornament #{ornament}"
-        debug 'ornament', ornament
+      switch
+        when typeof ornament is 'string'
+          parser.parse "ornament #{ornament}"
 
-      for statement in ornament
+        when ornament.length?
+
+          structure = ornament.map (statement) ->
+            compile_statement statement,commands,parser
+
+This function return `true` if the execution should stop.
+
+          ->
+            for statement in structure
+
+              truth = await statement.call this
+              return true if truth is 'over'
+
+              truth = not truth if statement.not
+
+Terminate the ornament and continue to the next one, if any condition or action returned false.
+
+              return false unless truth
+
+If no precondition / postcondition / action returned false, continue to the next ornament.
+
+            return false
+
+        else
+          NOTHING
+
+    compile_statement = (statement,commands,parser) ->
 
 A statement might be a `{type,param?,params?,not?}` object, or a `[('not',)type,params...]` array, or a `"(not )type( param param …)"` string.
 All statements are converted to `{type,param?,params?,not}` for evaluation.
 
-        if typeof statement is 'string'
-          statement = parser.parse "statement #{statement}"
-          debug 'statement', statement
+      switch
 
-        if statement.length?
+String statement
+
+        when typeof statement is 'string'
+          parser.parse "statement #{statement}"
+
+Array statement
+
+        when statement.length?
+
           params = statement[..]
-          statement = {}
           if params[0] is 'not'
             params.shift()
-            statement.not = true
-          statement.type = params.shift()
-          statement.params = params
-
-        unless statement.type?
-          debug 'No command', statement
-          return false
-
-        c = commands[statement.type]
-
-Terminate the ornament and continue to the next one, if the command is invalid.
-
-        unless c?
-          debug 'No such command', statement.type
-          return false
-
-Evaluate based on the presence of `params[]` or `param`.
-
-        switch
-          when statement.params?
-            debug "Calling #{statement.type}", statement.params
-            truth = await c.apply this, statement.params
-          when statement.param?
-            debug "Calling #{statement.type}", statement.param
-            truth = await c.call this, statement.param
+            truthy = NOT
           else
-            debug "Calling #{statement.type} (no arguments)"
-            truth = await c.call this
+            truthy = ID
 
-DEPRECATED: truth should be a boolean; this will soon change to `return truth if typeof truth isnt 'boolean'`.
+          type = params.shift()
+          return NOTHING unless type?
+          c = commands[type]
+          return NOTHING unless c?
 
-        if truth is 'over'
-          return true
+          -> truthy await c.apply this, params
 
-        truth = not truth if statement.not
+Object statement
 
-Terminate the ornament and continue to the next one, if any condition or action returned false.
+        else
 
-        return false unless truth
+          {type} = statement
+          return NOTHING unless type?
+          c = commands[type]
+          return NOTHING unless c?
 
-If no precondition / postcondition / action returned false, continue to the next ornament.
+          truthy = if statement.not then NOT else ID
 
-      return false
+          switch
+            when statement.params?
+              -> truthy await c.apply this, statement.params
+            when statement.param?
+              -> truthy await c.call this, statement.param
+            else
+              -> truthy await c.call this
+
+    run = (ornaments,commands) ->
+      (compile ornaments, commands, parser commands).call this
+
+    module.exports = {run,parser,compile}

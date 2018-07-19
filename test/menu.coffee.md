@@ -3,7 +3,7 @@
       it 'should compile', ->
         {Parser} = require '../language'
         parser = new Parser()
-        parser.yy.valid_op =
+        parser.yy.op =
           clear_call_center_tags: true
           clear_user_tags: true
           user_tag: true
