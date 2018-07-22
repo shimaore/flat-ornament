@@ -9,7 +9,7 @@
         parser = new Parser()
         parser.yy.Immutable = require 'immutable'
         parser.yy.op =
-          long: (x) ->
+          postpone: (x) ->
             Promise.resolve x
           sqrt: (x) -> Math.sqrt x
           get: (n) -> this[n]
@@ -33,11 +33,11 @@
           expect(await pp '-3+4').to.equal 1
         it 'should do function call', ->
           expect(await pp 'sqrt(49)').to.equal 7
-          expect(await pp '3+long(4)').to.equal 7
-          expect(await pp 'long(3) and long(4)').to.equal 4
+          expect(await pp '3+postpone(4)').to.equal 7
+          expect(await pp 'postpone(3) and postpone(4)').to.equal 4
         it 'should do variables', ->
           expect(await pp 'foo = "hello ", foo + "world"').to.equal 'hello world'
-          expect(await pp 'foo = "hello ", long(foo + "world")').to.equal 'hello world'
+          expect(await pp 'foo = "hello ", postpone(foo + "world")').to.equal 'hello world'
           expect(await pp '
             a = 1,
             b = 3,
@@ -47,7 +47,7 @@
         it 'should do conditionals', ->
           expect(await pp '
             foo = "hello ",
-            if sqrt(42) > 5 then long(foo + "world") else "pooh"
+            if sqrt(42) > 5 then postpone(foo + "world") else "pooh"
           ').to.equal 'hello world'
           expect(await pp '
             if 3 > 4 then "ok" else "no"

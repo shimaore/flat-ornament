@@ -24,7 +24,6 @@ NAME        [A-Za-z][\w-]*
 \s+             /* skip */
 
 "if"            return 'IF'
-"it"            return 'IT'
 "unless"        return 'UNLESS'
 "then"          return 'THEN'
 "else"          return 'ELSE'
@@ -32,6 +31,12 @@ NAME        [A-Za-z][\w-]*
 "or"            return 'OR'
 "not"           return 'NOT'
 "is"            return 'IS'
+"isn't"         return 'ISNT'
+"isnt"          return 'ISNT'
+"=="            return 'EQ'
+"!="            return 'NE'
+"<>"            return 'NE'
+"≠"             return 'NE'
 "true"          return 'TRUE'
 "false"         return 'FALSE'
 "greater"       return 'GREATER'
@@ -47,6 +52,8 @@ NAME        [A-Za-z][\w-]*
 {PATTERN}       return 'PATTERN'
 {NAME}          return (yy.op && yytext in yy.op) ? 'OP' : 'NAME'
 
+"#"[^\r\n]+[\r\n]  /* comment */
+
 <<EOF>>         return 'EOF'
 .               return yytext
 
@@ -59,12 +66,10 @@ NAME        [A-Za-z][\w-]*
 %left AND
 %left OR
 %left NOT
-%left '<' '>' IS '~'
+%left '<' '>' IS ISNT '~' EQ NE
 %left '+' '-'
-%left '*' '/'
+%left '*' '/' '%'
 %left '^'
-%right '!'
-%right '%'
 %left '['
 %left UMINUS
 %left OF
@@ -88,8 +93,7 @@ assignment
   ;
 
 expression
-  : IT                            -> function (ctx) { return ctx.get('it') }
-  | name                          -> function (ctx) { return ctx.get($1) }
+  : name                          -> function (ctx) { return ctx.get($1) }
   | float                         -> function (ctx) { return $1 }
   | integer                       -> function (ctx) { return $1 }
   | string                        -> function (ctx) { return $1 }
@@ -99,13 +103,20 @@ expression
   | expression OR  expression     -> async function (ctx) { var cond = await $1.call(this,ctx); return cond || $3.call(this,ctx) }
   | NOT expression                -> async function (ctx) { return ! await $2.call(this,ctx) }
   | expression '+' expression     -> async function (ctx) { var a = await $1.call(this,ctx); return a + await $3.call(this,ctx) }
-  | expression '*' expression     -> async function (ctx) { var a = await $1.call(this,ctx); return a * await $3.call(this,ctx) }
   | expression '-' expression     -> async function (ctx) { var a = await $1.call(this,ctx); return a - await $3.call(this,ctx) }
+  | expression '*' expression     -> async function (ctx) { var a = await $1.call(this,ctx); return a * await $3.call(this,ctx) }
+  | expression '/' expression     -> async function (ctx) { var a = await $1.call(this,ctx); return a / await $3.call(this,ctx) }
+  | expression '%' expression     -> async function (ctx) { var a = await $1.call(this,ctx); return a % await $3.call(this,ctx) }
   | expression '>' expression     -> async function (ctx) { var a = await $1.call(this,ctx); return a > await $3.call(this,ctx) }
   | expression IS GREATER THAN expression -> async function (ctx) { var a = await $1.call(this,ctx); return a > await $5.call(this,ctx) }
+  | expression IS NOT GREATER THAN expression -> async function (ctx) { var a = await $1.call(this,ctx); return !(a > await $5.call(this,ctx)) }
   | expression '<' expression     -> async function (ctx) { var a = await $1.call(this,ctx); return a < await $3.call(this,ctx) }
   | expression IS SMALLER THAN expression -> async function (ctx) { var a = await $1.call(this,ctx); return a < await $5.call(this,ctx) }
-  | expression IS  expression     -> async function (ctx) { var a = await $1.call(this,ctx); return a === await $3.call(this,ctx) }
+  | expression IS NOT SMALLER THAN expression -> async function (ctx) { var a = await $1.call(this,ctx); return !(a < await $5.call(this,ctx)) }
+  | expression EQ expression      -> async function (ctx) { var a = await $1.call(this,ctx); return a === await $3.call(this,ctx) }
+  | expression NE expression      -> async function (ctx) { var a = await $1.call(this,ctx); return a !== await $3.call(this,ctx) }
+  | expression IS expression      -> async function (ctx) { var a = await $1.call(this,ctx); return a === await $3.call(this,ctx) }
+  | expression ISNT expression    -> async function (ctx) { var a = await $1.call(this,ctx); return a !== await $3.call(this,ctx) }
   | THE name OF expression        -> async function (ctx) { var a = await $4.call(this,ctx); if (a.hasOwnProperty($2)) { return a[$2] }; if ($2 === 'length') { return a.length } }
   | expression '[' integer ']'    -> async function (ctx) { var a = await $1.call(this,ctx); if (a.hasOwnProperty($3)) { return a[$3] }; }
   | '-' expression  %prec UMINUS  -> async function (ctx) { return - await $2.call(this,ctx) }
