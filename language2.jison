@@ -59,6 +59,12 @@ NAME        [A-Za-z][\w-]*
 
 /lex
 
+%{
+
+const Immutable = require('immutable');
+
+%}
+
 /* operator association and precedence, if any */
 
 %right IF UNLESS
@@ -77,7 +83,7 @@ NAME        [A-Za-z][\w-]*
 %% /* grammar */
 
 start
-  : expressions EOF  { return function () { return $1.call(this,yy.Immutable.Map()) /* evaluate */ } }
+  : expressions EOF  { return function () { return $1.call(this,Immutable.Map()) /* evaluate */ } }
   |                  { return function () {} }
   ;
 
@@ -130,7 +136,6 @@ expression
   | IF expression THEN expression ELSE expression -> async function (ctx) { var cond = await $2.call(this,ctx); if (cond) { return $4.call(this,ctx) } else { return $6(ctx) } }
   | '(' expression ')'            -> $2
   | '[' parameters ']'            -> async function (ctx) { return await Promise.all($2.map( (a) => a.call(this,ctx) )); }
-  // | condition
   ;
 
 parameters
@@ -140,24 +145,6 @@ parameters
 
 parameter
   : expression -> $1
-  ;
-
-condition
-  : CALLED_ONNET            -> [{type:'called_onnet'}]
-  | CALLED_ONNET NAME       -> [{type:'called_onnet'}] /* "sur le réseau K-net" */
-  | CALLED_FIXED            -> [{type:'called_fixed'}]
-  | CALLED_FIXED_OR_MOBILE  -> [{type:'called_fixed_or_mobile'}]
-  | CALLED_MOBILE           -> [{type:'called_mobile'}]
-  | TOWARDS countries       -> [{type:'called_country',param:$2}]
-  | ATMOST callees                 -> name = yy.new_name(); $$ = [{type:'count_called',param:name},          {type:'at_most',params:[$2,name]}]
-  | ATMOST callees name            -> name = 'callee_'+$3;  $$ = [{type:'count_called',param:name},          {type:'at_most',params:[$2,name]}]
-  | ATMOST callees name PER_CYCLE  -> name = 'callee_'+$3;  $$ = [{type:'count_called',param:name},          {type:'at_most',params:[$2,name]}]
-  | ATMOST callees period          -> name = yy.new_name(); $$ = [{type:'count_called_per',params:[name,$3]},{type:'at_most',params:[$2,name]}]
-  | ATMOST callees name period     -> name = 'callee_'+$3;  $$ = [{type:'count_called_per',params:[name,$4]},{type:'at_most_per',params:[$2,name,$4]}]
-  | ATMOST duration PER_CALL       ->                       $$ = [{type:'per_call_up_to',param:$2}]
-  | ATMOST duration PER_CYCLE      -> name = yy.new_name(); $$ = [{type:'increment_duration',param:name},{type:'up_to',params:[$2,name]}]
-  | ATMOST duration name PER_CYCLE -> name = $3;            $$ = [{type:'increment_duration',param:name},{type:'up_to',params:[$2,name]}]
-  | ATMOST duration name period    -> name = $3;            $$ = [{type:'increment_duration_per',params:[name,$4]},{type:'up_to_per',params:[$2,name,$4]}]
   ;
 
 /* Constants */

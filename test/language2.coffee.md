@@ -7,7 +7,6 @@
       describe 'should parse simple expressions', ->
         {Parser} = require '../language2'
         parser = new Parser()
-        parser.yy.Immutable = require 'immutable'
         parser.yy.op =
           postpone: (x) ->
             Promise.resolve x

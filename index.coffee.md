@@ -16,9 +16,6 @@ This is the legacy parser for flat-ornament. It supports ornaments stored as a d
 
       p = new Parser()
       p.yy.op = commands
-      p.yy.NOTHING = NOTHING
-      p.yy.NOT = NOT
-      p.yy.ID = ID
       p
 
     compile = (ornaments,commands,parser) ->

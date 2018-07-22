@@ -60,6 +60,12 @@ NAME        [A-Za-z][\w-]+
 
 /lex
 
+%{
+
+const NOTHING = function () {};
+
+%}
+
 /* operator association and precedence, if any */
 
 %% /* grammar */
@@ -90,17 +96,17 @@ menu_label
 
 ornaments
   : ornaments ornament -> async function () { if ('over' !== await $1.call(this)) { return await $2.call(this) } }
-  |  -> yy.NOTHING
+  |  -> NOTHING
   ;
 
 ornament
   : c_ornament END -> $1
-  | IF c_ornament THEN c_ornament END -> async function() { return (await $2.call(this)) ? await $4.call(this) : yy.NOTHING }
+  | IF c_ornament THEN c_ornament END -> async function() { return (await $2.call(this)) ? await $4.call(this) : NOTHING }
   ;
 
 c_ornament
-  : c_ornament AND c_statement      -> async function() { return (await $1.call(this)) ? await $3.call(this) : yy.NOTHING }
-  | c_ornament ',' c_statement      -> async function() { return (await $1.call(this)) ? await $3.call(this) : yy.NOTHING }
+  : c_ornament AND c_statement      -> async function() { return (await $1.call(this)) ? await $3.call(this) : NOTHING }
+  | c_ornament ',' c_statement      -> async function() { return (await $1.call(this)) ? await $3.call(this) : NOTHING }
   | c_statement                     -> $1
   ;
 
