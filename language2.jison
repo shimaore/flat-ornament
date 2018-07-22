@@ -128,8 +128,8 @@ expression
   | '-' expression  %prec UMINUS  -> async function (ctx) { return - await $2.call(this,ctx) }
   | expression '~' pattern        -> async function (ctx) { var a = await $1.call(this,ctx); return (typeof a === 'string') && a.match($3); }
   | op '(' parameters ')'         -> async function (ctx) { var args = await Promise.all($3.map( (a) => a.call(this,ctx) )); return $1.apply(this,args); }
-  | op '(' ')'                    -> function (ctx) { return $1(); }
-  | op                            -> function (ctx) { return $1(); }
+  | op '(' ')'                    -> function (ctx) { return $1.call(this); }
+  | op                            -> function (ctx) { return $1.call(this); }
   | IF expression THEN expression                 -> async function (ctx) { var cond = await $2.call(this,ctx); if (cond) return $4.call(this,ctx); }
   | expression IF expression                      -> async function (ctx) { var cond = await $3.call(this,ctx); if (cond) return $1.call(this,ctx); }
   | expression UNLESS expression                  -> async function (ctx) { var cond = await $3.call(this,ctx); if (!cond) return $1.call(this,ctx); }

@@ -13,6 +13,7 @@
           sqrt: (x) -> Math.sqrt x
           get: (n) -> this[n]
           set: (n,v) -> this[n] = v
+          animal: -> this.ant
 
         state = bear: 4, ant: 3
         pp = (x) -> (parser.parse x).call state
@@ -88,3 +89,6 @@
           ').to.equal 126
           state.should.have.property 'bear', 42
           state.should.have.property 'dog', 126
+          expect(await pp '
+            animal
+          ').to.equal state.ant
