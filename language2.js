@@ -180,10 +180,10 @@ case 36:
 this.$ = async function (ctx) { var args = await Promise.all($$[$0-1].map( (a) => a.call(this,ctx) )); return $$[$0-3].apply(this,args); };
 break;
 case 37:
-this.$ = function (ctx) { return $$[$0-2](); };
+this.$ = function (ctx) { return $$[$0-2].call(this); };
 break;
 case 38:
-this.$ = function (ctx) { return $$[$0](); };
+this.$ = function (ctx) { return $$[$0].call(this); };
 break;
 case 39:
 this.$ = async function (ctx) { var cond = await $$[$0-2].call(this,ctx); if (cond) return $$[$0].call(this,ctx); };
