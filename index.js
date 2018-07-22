@@ -26,9 +26,6 @@
     var p;
     p = new Parser();
     p.yy.op = commands;
-    p.yy.NOTHING = NOTHING;
-    p.yy.NOT = NOT;
-    p.yy.ID = ID;
     return p;
   };
 
