@@ -72,193 +72,94 @@
   }
 */
 var language = (function(){
-var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[5,20],$V1=[5,59],$V2=[2,13],$V3=[1,20],$V4=[1,27],$V5=[1,32],$V6=[1,33],$V7=[1,29],$V8=[1,30],$V9=[1,31],$Va=[5,20,27,32,34,35,47,53,55],$Vb=[1,47],$Vc=[1,48],$Vd=[23,24,28,29,30],$Ve=[24,30],$Vf=[5,23,24,28,29,30],$Vg=[5,24,30],$Vh=[1,55],$Vi=[1,56],$Vj=[1,69],$Vk=[1,70],$Vl=[1,71],$Vm=[1,72],$Vn=[1,73],$Vo=[1,74],$Vp=[1,75],$Vq=[1,93],$Vr=[1,94],$Vs=[1,95],$Vt=[1,96],$Vu=[24,64,66,67,68,69,71,91],$Vv=[1,106],$Vw=[1,107],$Vx=[1,108],$Vy=[1,117],$Vz=[30,37],$VA=[24,30,64,66,67,68,69,71,91],$VB=[1,123],$VC=[1,124],$VD=[1,125],$VE=[1,126],$VF=[1,127],$VG=[65,74,77];
-var parser = {trace: function trace() { },
+var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[5,15],$V1=[2,10],$V2=[1,13],$V3=[1,16],$V4=[1,19],$V5=[1,20],$V6=[1,28],$V7=[1,29],$V8=[18,20,21,22],$V9=[5,18,20,21,22],$Va=[5,15,19,24,27,40],$Vb=[1,46],$Vc=[1,47],$Vd=[1,48],$Ve=[1,49],$Vf=[1,54],$Vg=[22,29];
+var parser = {trace: function trace () { },
 yy: {},
-symbols_: {"error":2,"start":3,"menus":4,"EOF":5,"COMPILE":6,"ORNAMENTS":7,"ornaments":8,"ORNAMENT":9,"ornament":10,"STATEMENT":11,"c_statement":12,"fr_statement":13,"en_statement":14,"CGU":15,"fr_cgu":16,"menu":17,"menu_label":18,":":19,"MENU":20,"INTEGER":21,"c_ornament":22,";":23,".":24,"fr_ornament":25,"en_ornament":26,"IF":27,"THEN":28,"AND":29,",":30,"command":31,"NOT":32,"operation":33,"OP":34,"(":35,"parameters":36,")":37,"parameter":38,"integer":39,"float":40,"string":41,"pattern":42,"FLOAT":43,"STRING":44,"PATTERN":45,"fr_command":46,"CLEAR":47,"THE":48,"TAGS":49,"OF_THE":50,"CALL_CENTER":51,"USER":52,"GO":53,"TO_THE":54,"EXECUTE":55,"en_command":56,"fr_cgu_sentence":57,"sentence":58,"CALLS":59,"conditions":60,"outcomes":61,"condition":62,"outcome":63,"CALLED_ONNET":64,"NAME":65,"CALLED_FIXED":66,"CALLED_FIXED_OR_MOBILE":67,"CALLED_MOBILE":68,"TOWARDS":69,"countries":70,"ATMOST":71,"callees":72,"name":73,"PER_CYCLE":74,"period":75,"duration":76,"PER_CALL":77,"CALLEE":78,"time_unit":79,"PER_DAY":80,"PER_HOUR":81,"PER_WEEK":82,"DAY_OF_WEEK":83,"SECONDS":84,"MINUTES":85,"HOURS":86,"country":87,"fr":88,"be":89,"ch":90,"FREE":91,"$accept":0,"$end":1},
-terminals_: {2:"error",5:"EOF",6:"COMPILE",7:"ORNAMENTS",9:"ORNAMENT",11:"STATEMENT",15:"CGU",19:":",20:"MENU",21:"INTEGER",23:";",24:".",27:"IF",28:"THEN",29:"AND",30:",",32:"NOT",34:"OP",35:"(",37:")",43:"FLOAT",44:"STRING",45:"PATTERN",47:"CLEAR",48:"THE",49:"TAGS",50:"OF_THE",51:"CALL_CENTER",52:"USER",53:"GO",54:"TO_THE",55:"EXECUTE",59:"CALLS",64:"CALLED_ONNET",65:"NAME",66:"CALLED_FIXED",67:"CALLED_FIXED_OR_MOBILE",68:"CALLED_MOBILE",69:"TOWARDS",71:"ATMOST",74:"PER_CYCLE",77:"PER_CALL",78:"CALLEE",80:"PER_DAY",81:"PER_HOUR",82:"PER_WEEK",83:"DAY_OF_WEEK",84:"SECONDS",85:"MINUTES",86:"HOURS",88:"fr",89:"be",90:"ch",91:"FREE"},
-productions_: [0,[3,2],[3,4],[3,4],[3,4],[3,4],[3,4],[3,3],[4,2],[4,0],[17,3],[18,2],[8,2],[8,0],[10,2],[10,2],[10,2],[10,2],[10,5],[10,5],[22,3],[22,3],[22,1],[25,3],[25,1],[26,3],[26,1],[12,1],[31,2],[31,1],[33,4],[33,3],[33,3],[33,4],[33,1],[36,3],[36,1],[38,1],[38,1],[38,1],[38,1],[39,1],[40,1],[41,1],[42,1],[13,1],[46,5],[46,5],[46,4],[46,4],[46,2],[14,1],[56,3],[16,2],[16,0],[57,2],[58,3],[58,4],[58,3],[60,2],[60,1],[61,2],[61,1],[62,1],[62,2],[62,1],[62,1],[62,1],[62,2],[62,2],[62,3],[62,4],[62,3],[62,4],[62,3],[62,3],[62,4],[62,4],[73,1],[72,2],[76,2],[75,1],[75,1],[75,1],[75,1],[79,1],[79,1],[79,1],[70,3],[70,1],[87,1],[87,1],[87,1],[63,1]],
+symbols_: {"error":2,"start":3,"menus":4,"EOF":5,"ORNAMENTS":6,"ornaments":7,"ORNAMENT":8,"ornament":9,"STATEMENT":10,"c_statement":11,"menu":12,"menu_label":13,":":14,"MENU":15,"INTEGER":16,"c_ornament":17,"END":18,"IF":19,"THEN":20,"AND":21,",":22,"command":23,"NOT":24,"operation":25,"op":26,"(":27,"parameters":28,")":29,"parameter":30,"integer":31,"float":32,"string":33,"pattern":34,"FLOAT":35,"STRING":36,"PATTERN":37,"name":38,"NAME":39,"OP":40,"$accept":0,"$end":1},
+terminals_: {2:"error",5:"EOF",6:"ORNAMENTS",8:"ORNAMENT",10:"STATEMENT",14:":",15:"MENU",16:"INTEGER",18:"END",19:"IF",20:"THEN",21:"AND",22:",",24:"NOT",27:"(",29:")",35:"FLOAT",36:"STRING",37:"PATTERN",39:"NAME",40:"OP"},
+productions_: [0,[3,2],[3,3],[3,3],[3,3],[4,2],[4,0],[12,3],[13,2],[7,2],[7,0],[9,2],[9,5],[17,3],[17,3],[17,1],[11,1],[23,2],[23,1],[25,4],[25,3],[25,3],[25,4],[25,1],[28,3],[28,1],[30,1],[30,1],[30,1],[30,1],[31,1],[32,1],[33,1],[34,1],[38,1],[26,1]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
 /* this == yyval */
 
 var $0 = $$.length - 1;
 switch (yystate) {
-case 1: case 2: case 3: case 4: case 5: case 6: case 7:
+case 1: case 2: case 3: case 4:
  return $$[$0-1] 
 break;
-case 8:
+case 5:
 this.$ = $$[$0-1]; this.$[$$[$0][0]] = $$[$0][1];
 break;
-case 9:
+case 6:
 this.$ = {};
 break;
-case 10:
+case 7:
 this.$ = [$$[$0-2],$$[$0]];
 break;
-case 11:
+case 8:
 this.$ =  $$[$0];
 break;
-case 12: case 53:
-this.$ = $$[$0-1].concat([$$[$0]]);
+case 9:
+this.$ = async function () { if ('over' !== await $$[$0-1].call(this)) { return await $$[$0].call(this) } };
 break;
-case 13:
-this.$ = [];
+case 10:
+this.$ = yy.NOTHING;
 break;
-case 14: case 15: case 16: case 17: case 79:
+case 11:
 this.$ = $$[$0-1];
 break;
-case 18: case 19:
-this.$ = $$[$0-3].concat([$$[$0-1]]);
+case 12:
+this.$ = async function() { return (await $$[$0-3].call(this)) ? await $$[$0-1].call(this) : yy.NOTHING };
 break;
-case 20: case 21: case 23: case 25: case 88:
-this.$ = $$[$0-2].concat([$$[$0]]);
+case 13: case 14:
+this.$ = async function() { return (await $$[$0-2].call(this)) ? await $$[$0].call(this) : yy.NOTHING };
 break;
-case 22: case 24: case 26: case 36: case 89:
-this.$ = [$$[$0]];
-break;
-case 27: case 29: case 37: case 38: case 39: case 40: case 45: case 50: case 51: case 60: case 62:
+case 15: case 16: case 18: case 26: case 27: case 28: case 29:
 this.$ = $$[$0];
 break;
-case 28:
-this.$ = $$[$0]; this.$.not = true;
+case 17:
+this.$ = async function () { return !await $$[$0].call(this) };
 break;
-case 30:
-this.$ = {type:$$[$0-3],params:$$[$0-1]};
+case 19:
+this.$ = async function () { return $$[$0-3].apply(this,$$[$0-1]) };
 break;
-case 31:
-this.$ = {type:$$[$0-2]};
+case 20:
+this.$ = async function () { return $$[$0-2].call(this) };
 break;
-case 32:
-this.$ = {type:$$[$0-1]};
+case 21:
+this.$ = async function () { return $$[$0-1].call(this) };
 break;
-case 33:
-this.$ = {type:$$[$0-2],params:$$[$0-1]};
+case 22:
+this.$ = async function () { return $$[$0-2].apply(this,$$[$0-1]) };
 break;
-case 34:
-this.$ = {type:$$[$0]};
+case 23:
+this.$ = async function () { return $$[$0].call(this) };
 break;
-case 35:
+case 24:
 this.$ = $$[$0-2].concat([$$[$0]]);;
 break;
-case 41:
+case 25:
+this.$ = [$$[$0]];
+break;
+case 30:
 this.$ = parseInt(yytext,10);
 break;
-case 42:
+case 31:
 this.$ = parseFloat(yytext);
 break;
-case 43: case 44:
+case 32: case 33:
 this.$ = yytext.substr(1,yytext.length-2);
 break;
-case 46: case 52:
-this.$ = {type:'clear_call_center_tags'};
-break;
-case 47: case 48:
-this.$ = {type:'clear_user_tags'};
-break;
-case 49:
-this.$ = {type:'goto_menu',params:[$$[$0]]};
-break;
-case 54:
-this.$ = /* hide_emergency */ [[{type:'called_emergency'}, {type:'hide_call'}, {type:'stop'}]];
-break;
-case 55:
-this.$ = [{type:'reset_up_to'}].concat($$[$0-1],[{type:'stop'}]);
-break;
-case 56: case 59: case 61:
-this.$ = $$[$0-1].concat($$[$0]);
-break;
-case 57:
-this.$ = $$[$0-2].concat($$[$0], $$[$0-1]);
-break;
-case 58:
-this.$ = $$[$0].concat($$[$0-1]);
-break;
-case 63: case 64:
-this.$ = [{type:'called_onnet'}];
-break;
-case 65:
-this.$ = [{type:'called_fixed'}];
-break;
-case 66:
-this.$ = [{type:'called_fixed_or_mobile'}];
-break;
-case 67:
-this.$ = [{type:'called_mobile'}];
-break;
-case 68:
-this.$ = [{type:'called_country',param:$$[$0]}];
-break;
-case 69:
-this.$ = name = yy.new_name(); this.$ = [{type:'count_called',param:name},          {type:'at_most',params:[$$[$0],name]}];
-break;
-case 70:
-this.$ = name = 'callee_'+$$[$0];  this.$ = [{type:'count_called',param:name},          {type:'at_most',params:[$$[$0-1],name]}];
-break;
-case 71:
-this.$ = name = 'callee_'+$$[$0-1];  this.$ = [{type:'count_called',param:name},          {type:'at_most',params:[$$[$0-2],name]}];
-break;
-case 72:
-this.$ = name = yy.new_name(); this.$ = [{type:'count_called_per',params:[name,$$[$0]]},{type:'at_most',params:[$$[$0-1],name]}];
-break;
-case 73:
-this.$ = name = 'callee_'+$$[$0-1];  this.$ = [{type:'count_called_per',params:[name,$$[$0]]},{type:'at_most_per',params:[$$[$0-2],name,$$[$0]]}];
-break;
-case 74:
-this.$ =                       this.$ = [{type:'per_call_up_to',param:$$[$0-1]}];
-break;
-case 75:
-this.$ = name = yy.new_name(); this.$ = [{type:'increment_duration',param:name},{type:'up_to',params:[$$[$0-1],name]}];
-break;
-case 76:
-this.$ = name = $$[$0-1];            this.$ = [{type:'increment_duration',param:name},{type:'up_to',params:[$$[$0-2],name]}];
-break;
-case 77:
-this.$ = name = $$[$0-1];            this.$ = [{type:'increment_duration_per',params:[name,$$[$0]]},{type:'up_to_per',params:[$$[$0-2],name,$$[$0]]}];
-break;
-case 78:
+case 34:
 this.$ = yytext;
 break;
-case 80:
-this.$ = $$[$0-1] * $$[$0];
-break;
-case 81:
-this.$ = 'day';
-break;
-case 82:
-this.$ = 'hour';
-break;
-case 83:
-this.$ = 'week';
-break;
-case 84:
-this.$ = 'day-of-week';
-break;
-case 85:
-this.$ = 1;
-break;
-case 86:
-this.$ = 60;
-break;
-case 87:
-this.$ = 3600;
-break;
-case 90:
-this.$ = 'fr';
-break;
-case 91:
-this.$ = 'be';
-break;
-case 92:
-this.$ = 'ch';
-break;
-case 93:
-this.$ = [{type:'free'}];
+case 35:
+this.$ = yy.op[yytext];
 break;
 }
 },
-table: [o($V0,[2,9],{3:1,4:2,6:[1,3],15:[1,4]}),{1:[3]},{5:[1,5],17:6,18:7,20:[1,8]},{7:[1,9],9:[1,10],11:[1,11]},o($V1,[2,54],{16:12}),{1:[2,1]},o($V0,[2,8]),{19:[1,13]},{21:[1,14]},o([5,27,32,34,35,47,53,55],$V2,{8:15}),{10:16,12:21,13:22,14:23,22:17,25:18,26:19,27:$V3,31:24,32:$V4,33:28,34:$V5,35:$V6,46:25,47:$V7,53:$V8,55:$V9,56:26},{12:34,13:35,14:36,31:24,32:$V4,33:28,34:$V5,35:$V6,46:25,47:$V7,53:$V8,55:$V9,56:26},{5:[1,37],57:38,58:39,59:[1,40]},o($Va,$V2,{8:41}),{19:[2,11]},{5:[1,42],10:43,12:21,13:22,14:23,22:17,25:18,26:19,27:$V3,31:24,32:$V4,33:28,34:$V5,35:$V6,46:25,47:$V7,53:$V8,55:$V9,56:26},{5:[1,44]},{23:[1,45],24:[1,46],29:$Vb,30:$Vc},{24:[1,49],30:[1,50]},{24:[1,51],30:[1,52]},{12:21,22:53,31:24,32:$V4,33:28,34:$V5,35:$V6},o($Vd,[2,22]),o($Ve,[2,24]),o($Ve,[2,26]),o($Vf,[2,27]),o($Vg,[2,45]),o($Vg,[2,51]),{33:54,34:$V5,35:$V6},o($Vf,[2,29]),{48:$Vh,51:$Vi},{54:[1,57]},{33:58,34:$V5,35:$V6},o($Vf,[2,34],{35:[1,59]}),{34:[1,60]},{5:[1,61]},{5:[1,62]},{5:[1,63]},{1:[2,7]},o($V1,[2,53]),{24:[1,64]},{60:65,61:66,62:67,63:68,64:$Vj,66:$Vk,67:$Vl,68:$Vm,69:$Vn,71:$Vo,91:$Vp},o($V0,[2,10],{22:17,25:18,26:19,12:21,13:22,14:23,31:24,46:25,56:26,33:28,10:43,27:$V3,32:$V4,34:$V5,35:$V6,47:$V7,53:$V8,55:$V9}),{1:[2,2]},o($Va,[2,12]),{1:[2,3]},o($Va,[2,14]),o($Va,[2,15]),{12:76,31:24,32:$V4,33:28,34:$V5,35:$V6},{12:77,31:24,32:$V4,33:28,34:$V5,35:$V6},o($Va,[2,16]),{13:78,46:25,47:[1,79],53:$V8,55:$V9},o($Va,[2,17]),{14:80,47:[1,81],56:26},{28:[1,82],29:$Vb,30:$Vc},o($Vf,[2,28]),{49:[1,83]},{49:[1,84]},{20:[1,85]},o($Vg,[2,50]),{21:$Vq,36:86,37:[1,87],38:88,39:89,40:90,41:91,42:92,43:$Vr,44:$Vs,45:$Vt},{21:$Vq,36:98,37:[1,97],38:88,39:89,40:90,41:91,42:92,43:$Vr,44:$Vs,45:$Vt},{1:[2,4]},{1:[2,5]},{1:[2,6]},o($V1,[2,55]),{61:99,62:100,63:68,64:$Vj,66:$Vk,67:$Vl,68:$Vm,69:$Vn,71:$Vo,91:$Vp},{60:101,62:67,63:102,64:$Vj,66:$Vk,67:$Vl,68:$Vm,69:$Vn,71:$Vo,91:$Vp},o($Vu,[2,60]),o($Vu,[2,62]),o($Vu,[2,63],{65:[1,103]}),o($Vu,[2,65]),o($Vu,[2,66]),o($Vu,[2,67]),{70:104,87:105,88:$Vv,89:$Vw,90:$Vx},{21:$Vq,39:111,72:109,76:110},o($Vu,[2,93]),o($Vd,[2,20]),o($Vd,[2,21]),o($Ve,[2,23]),{48:$Vh},o($Ve,[2,25]),{51:$Vi},{12:21,22:112,31:24,32:$V4,33:28,34:$V5,35:$V6},{50:[1,113],52:[1,114]},o($Vg,[2,52]),{21:$Vq,39:115},{30:$Vy,37:[1,116]},o($Vf,[2,31]),o($Vz,[2,36]),o($Vz,[2,37]),o($Vz,[2,38]),o($Vz,[2,39]),o($Vz,[2,40]),o([5,24,30,37,78,84,85,86],[2,41]),o($Vz,[2,42]),o($Vz,[2,43]),o($Vz,[2,44]),o($Vf,[2,32]),{30:$Vy,37:[1,118]},{24:[2,56],60:119,62:67,63:102,64:$Vj,66:$Vk,67:$Vl,68:$Vm,69:$Vn,71:$Vo,91:$Vp},o($Vu,[2,59]),{24:[2,58],62:100,64:$Vj,66:$Vk,67:$Vl,68:$Vm,69:$Vn,71:$Vo},o($Vu,[2,61]),o($Vu,[2,64]),o($Vu,[2,68],{30:[1,120]}),o($VA,[2,89]),o($VA,[2,90]),o($VA,[2,91]),o($VA,[2,92]),o($Vu,[2,69],{73:121,75:122,65:$VB,80:$VC,81:$VD,82:$VE,83:$VF}),{65:$VB,73:130,74:[1,129],77:[1,128]},{78:[1,131],79:132,84:[1,133],85:[1,134],86:[1,135]},{23:[1,136],24:[1,137],29:$Vb,30:$Vc},{51:[1,138],52:[1,139]},o($Vg,[2,48]),o($Vg,[2,49]),o($Vf,[2,30]),{21:$Vq,38:140,39:89,40:90,41:91,42:92,43:$Vr,44:$Vs,45:$Vt},o($Vf,[2,33]),{24:[2,57],62:100,64:$Vj,66:$Vk,67:$Vl,68:$Vm,69:$Vn,71:$Vo},{87:141,88:$Vv,89:$Vw,90:$Vx},o($Vu,[2,70],{75:143,74:[1,142],80:$VC,81:$VD,82:$VE,83:$VF}),o($Vu,[2,72]),o([24,64,66,67,68,69,71,74,80,81,82,83,91],[2,78]),o($Vu,[2,81]),o($Vu,[2,82]),o($Vu,[2,83]),o($Vu,[2,84]),o($Vu,[2,74]),o($Vu,[2,75]),{74:[1,144],75:145,80:$VC,81:$VD,82:$VE,83:$VF},o([24,64,65,66,67,68,69,71,80,81,82,83,91],[2,79]),o($VG,[2,80]),o($VG,[2,85]),o($VG,[2,86]),o($VG,[2,87]),o($Va,[2,18]),o($Va,[2,19]),o($Vg,[2,46]),o($Vg,[2,47]),o($Vz,[2,35]),o($VA,[2,88]),o($Vu,[2,71]),o($Vu,[2,73]),o($Vu,[2,76]),o($Vu,[2,77])],
-defaultActions: {5:[2,1],14:[2,11],37:[2,7],42:[2,2],44:[2,3],61:[2,4],62:[2,5],63:[2,6]},
-parseError: function parseError(str, hash) {
+table: [o($V0,[2,6],{3:1,4:2,6:[1,3],8:[1,4],10:[1,5]}),{1:[3]},{5:[1,6],12:7,13:8,15:[1,9]},o([5,19,24,27,40],$V1,{7:10}),{9:11,11:14,17:12,19:$V2,23:15,24:$V3,25:17,26:18,27:$V4,40:$V5},{11:21,23:15,24:$V3,25:17,26:18,27:$V4,40:$V5},{1:[2,1]},o($V0,[2,5]),{14:[1,22]},{16:[1,23]},{5:[1,24],9:25,11:14,17:12,19:$V2,23:15,24:$V3,25:17,26:18,27:$V4,40:$V5},{5:[1,26]},{18:[1,27],21:$V6,22:$V7},{11:14,17:30,23:15,24:$V3,25:17,26:18,27:$V4,40:$V5},o($V8,[2,15]),o($V9,[2,16]),{25:31,26:18,27:$V4,40:$V5},o($V9,[2,18]),o($V9,[2,23],{27:[1,32]}),{26:33,40:$V5},o([5,16,18,20,21,22,27,29,35,36,37],[2,35]),{5:[1,34]},o($Va,$V1,{7:35}),{14:[2,8]},{1:[2,2]},o($Va,[2,9]),{1:[2,3]},o($Va,[2,11]),{11:36,23:15,24:$V3,25:17,26:18,27:$V4,40:$V5},{11:37,23:15,24:$V3,25:17,26:18,27:$V4,40:$V5},{20:[1,38],21:$V6,22:$V7},o($V9,[2,17]),{16:$Vb,28:39,29:[1,40],30:41,31:42,32:43,33:44,34:45,35:$Vc,36:$Vd,37:$Ve},{16:$Vb,28:51,29:[1,50],30:41,31:42,32:43,33:44,34:45,35:$Vc,36:$Vd,37:$Ve},{1:[2,4]},o($V0,[2,7],{17:12,11:14,23:15,25:17,26:18,9:25,19:$V2,24:$V3,27:$V4,40:$V5}),o($V8,[2,13]),o($V8,[2,14]),{11:14,17:52,23:15,24:$V3,25:17,26:18,27:$V4,40:$V5},{22:$Vf,29:[1,53]},o($V9,[2,20]),o($Vg,[2,25]),o($Vg,[2,26]),o($Vg,[2,27]),o($Vg,[2,28]),o($Vg,[2,29]),o($Vg,[2,30]),o($Vg,[2,31]),o($Vg,[2,32]),o($Vg,[2,33]),o($V9,[2,21]),{22:$Vf,29:[1,55]},{18:[1,56],21:$V6,22:$V7},o($V9,[2,19]),{16:$Vb,30:57,31:42,32:43,33:44,34:45,35:$Vc,36:$Vd,37:$Ve},o($V9,[2,22]),o($Va,[2,12]),o($Vg,[2,24])],
+defaultActions: {6:[2,1],23:[2,8],24:[2,2],26:[2,3],34:[2,4]},
+parseError: function parseError (str, hash) {
     if (hash.recoverable) {
         this.trace(str);
     } else {
@@ -546,7 +447,7 @@ showPosition:function () {
     },
 
 // test the lexed token: return FALSE when not a match, otherwise return token
-test_match:function (match, indexed_rule) {
+test_match:function(match, indexed_rule) {
         var token,
             lines,
             backup;
@@ -676,7 +577,7 @@ next:function () {
     },
 
 // return next match that has a token
-lex:function lex() {
+lex:function lex () {
         var r = this.next();
         if (r) {
             return r;
@@ -686,12 +587,12 @@ lex:function lex() {
     },
 
 // activates a new lexer condition state (pushes the new lexer condition state onto the condition stack)
-begin:function begin(condition) {
+begin:function begin (condition) {
         this.conditionStack.push(condition);
     },
 
 // pop the previously active lexer condition state off the condition stack
-popState:function popState() {
+popState:function popState () {
         var n = this.conditionStack.length - 1;
         if (n > 0) {
             return this.conditionStack.pop();
@@ -701,7 +602,7 @@ popState:function popState() {
     },
 
 // produce the lexer rule set which is active for the currently active lexer condition state
-_currentRules:function _currentRules() {
+_currentRules:function _currentRules () {
         if (this.conditionStack.length && this.conditionStack[this.conditionStack.length - 1]) {
             return this.conditions[this.conditionStack[this.conditionStack.length - 1]].rules;
         } else {
@@ -710,7 +611,7 @@ _currentRules:function _currentRules() {
     },
 
 // return the currently active lexer condition state; when an index argument is provided it produces the N-th previous condition state, if available
-topState:function topState(n) {
+topState:function topState (n) {
         n = this.conditionStack.length - 1 - Math.abs(n || 0);
         if (n >= 0) {
             return this.conditionStack[n];
@@ -720,7 +621,7 @@ topState:function topState(n) {
     },
 
 // alias for begin(condition)
-pushState:function pushState(condition) {
+pushState:function pushState (condition) {
         this.begin(condition);
     },
 
@@ -734,312 +635,62 @@ var YYSTATE=YY_START;
 switch($avoiding_name_collisions) {
 case 0:/* hash comments */
 break;
-case 1:/* skip whitespace */
+case 1:this.begin('simple'); return 15
 break;
-case 2:return 43
+case 2:this.begin('simple'); return 6
 break;
-case 3:return 21
+case 3:this.begin('simple'); return 8
 break;
-case 4:return 44
+case 4:this.begin('simple'); return 10
 break;
-case 5:return 44
+case 5:return 5
 break;
-case 6:return 45
+case 6:return yy_.yytext
 break;
-case 7:return 20
+case 7:return 15
 break;
-case 8:return 29
+case 8:return 19
 break;
-case 9:return 29
+case 9:return 20
 break;
-case 10:return 35
+case 10:return 21
 break;
-case 11:return 37
+case 11:return 21
 break;
-case 12:return '['
+case 12:return 24
 break;
-case 13:return ']'
+case 13:return 24
 break;
-case 14:return 32
+case 14:return 18
 break;
-case 15:return 32
+case 15:return 18
 break;
-case 16:return 19
+case 16:return 18
 break;
-case 17:return 27
+case 17:return 35
 break;
-case 18:return 27
+case 18:return 16
 break;
-case 19:return 27
+case 19:return 36
 break;
-case 20:return 27
+case 20:return 36
 break;
-case 21:return 28
+case 21:return 37
 break;
-case 22:return 28
+case 22:return (yy.op && yy_.yytext in yy.op) ? 'OP' : 'NAME';
 break;
-case 23:this.begin("fr"); return 47
+case 23:/* skip whitespace */
 break;
-case 24:this.begin("en"); return 47
+case 24:return 5
 break;
-case 25:this.begin("fr"); return 'USE'
+case 25:return yy_.yytext
 break;
-case 26:this.begin("en"); return 'USE'
-break;
-case 27:this.begin("fr"); return 53
-break;
-case 28:this.begin("frcgu"); return 15
-break;
-case 29:return 47
-break;
-case 30:return 47
-break;
-case 31:return 'USE'
-break;
-case 32:return 'USE'
-break;
-case 33:return 53
-break;
-case 34:return 49
-break;
-case 35:return 49
-break;
-case 36:return 51
-break;
-case 37:return 51
-break;
-case 38:return 52
-break;
-case 39:return 52
-break;
-case 40:return 'STOP'
-break;
-case 41:return 'RINGER'
-break;
-case 42:return 'CALL'
-break;
-case 43:return 'CALL'
-break;
-case 44:return 'ANONYMOUS'
-break;
-case 45:return 'ANONYMOUS'
-break;
-case 46:return 48
-break;
-case 47:return 48
-break;
-case 48:return 48
-break;
-case 49:return 48
-break;
-case 50:return 48
-break;
-case 51:return 'OF'
-break;
-case 52:return 50
-break;
-case 53:return 'FOR'
-break;
-case 54:return 'FOR'
-break;
-case 55:return 'SOME'
-break;
-case 56:return 'SOME'
-break;
-case 57:return 54
-break;
-case 58:return 'TO'
-break;
-case 59:return 59
-break;
-case 60:return 64
-break;
-case 61:return 66
-break;
-case 62:return 68
-break;
-case 63:return 67
-break;
-case 64:return 69
-break;
-case 65:return 69
-break;
-case 66:return 'UNLIMITED'
-break;
-case 67:return 71
-break;
-case 68:return 71
-break;
-case 69:return 71
-break;
-case 70:return 86
-break;
-case 71:return 'PER_MONTH'
-break;
-case 72:return 'PER_MONTH'
-break;
-case 73:return 78
-break;
-case 74:return 'DIFFERENT'
-break;
-case 75:return 'DIFFERENT'
-break;
-case 76:return 74
-break;
-case 77:return 74
-break;
-case 78:return 91
-break;
-case 79:return 77
-break;
-case 80:return 80
-break;
-case 81:return 81
-break;
-case 82:return 82
-break;
-case 83:return 'PER_DAY_OF_WEEK'
-break;
-case 84:return 86
-break;
-case 85:return 86
-break;
-case 86:return 85
-break;
-case 87:return 85
-break;
-case 88:return 'SECONDES'
-break;
-case 89:return 'SECONDES'
-break;
-case 90:return 88
-break;
-case 91:return 'de'
-break;
-case 92:return 'uk'
-break;
-case 93:return 'xx'
-break;
-case 94:return 'xx'
-break;
-case 95:return 'xx'
-break;
-case 96:return 'xx'
-break;
-case 97:return 89
-break;
-case 98:return 'xx'
-break;
-case 99:return 'xx'
-break;
-case 100:return 'xx'
-break;
-case 101:return 'xx'
-break;
-case 102:return 'xx'
-break;
-case 103:return 'xx'
-break;
-case 104:return 'xx'
-break;
-case 105:return 'xx'
-break;
-case 106:return 'xx'
-break;
-case 107:return 'xx'
-break;
-case 108:return 'xx'
-break;
-case 109:return 'xx'
-break;
-case 110:return 'xx'
-break;
-case 111:return 'xx'
-break;
-case 112:return 'xx'
-break;
-case 113:return 'xx'
-break;
-case 114:return 'xx'
-break;
-case 115:return 'xx'
-break;
-case 116:return 'xx'
-break;
-case 117:return 'xx'
-break;
-case 118:return 'xx'
-break;
-case 119:return 'xx'
-break;
-case 120:return 'xx'
-break;
-case 121:return 'xx'
-break;
-case 122:return 'xx'
-break;
-case 123:return 'xx'
-break;
-case 124:return 'xx'
-break;
-case 125:return 'xx'
-break;
-case 126:return 'xx'
-break;
-case 127:return 'xx'
-break;
-case 128:return 'xx'
-break;
-case 129:return 'xx'
-break;
-case 130:return 'xx'
-break;
-case 131:return 'xx'
-break;
-case 132:return 'xx'
-break;
-case 133:return 'xx'
-break;
-case 134:return 'xx'
-break;
-case 135:return 90
-break;
-case 136:return 'xx'
-break;
-case 137:return 'xx'
-break;
-case 138:return 'xx'
-break;
-case 139:return 'us'
-break;
-case 140:return 'xx'
-break;
-case 141:return 23
-break;
-case 142:/* ignore */
-break;
-case 143:return 24
-break;
-case 144:return 65
-break;
-case 145:this.popState(); return 23
-break;
-case 146:this.popState(); return 24
-break;
-case 147:return (yy.valid_op && yy_.yytext in yy.valid_op) ? 'OP' : yy_.yytext;
-break;
-case 148:return 5
-break;
-case 149:return 'JSON'
-break;
-case 150:return yy_.yytext
-break;
-case 151:console.log(yy_.yytext);
+case 26:console.log(yy_.yytext);
 break;
 }
 },
-rules: [/^(?:#[^\r\n]*?[\r\n])/,/^(?:\s+)/,/^(?:[0-9]+\.(?:[0-9]+)?\b)/,/^(?:[0-9]+)/,/^(?:["]([^"\r\n]*)["])/,/^(?:[']([^'\r\n]*)['])/,/^(?:[\/](\d|\?|\.|\.\.|\.\.\.|)+[\/])/,/^(?:menu)/,/^(?:and)/,/^(?:&&)/,/^(?:\()/,/^(?:\))/,/^(?:\[)/,/^(?:\])/,/^(?:not)/,/^(?:!)/,/^(?::)/,/^(?:si)/,/^(?:Si)/,/^(?:if)/,/^(?:If)/,/^(?:alors)/,/^(?:then)/,/^(?:Efface)/,/^(?:Clear)/,/^(?:Utilise)/,/^(?:Use)/,/^(?:Va)/,/^(?:Conditions Générales d'Utilisation)/,/^(?:[Ee]fface)/,/^(?:[Cc]lear)/,/^(?:[Uu]tilise)/,/^(?:[Uu]se)/,/^(?:[Vv]a)/,/^(?:indications)/,/^(?:tags)/,/^(?:centre\s+d'appel)/,/^(?:call-center)/,/^(?:utilisateur)/,/^(?:user)/,/^(?:finir)/,/^(?:sonnerie)/,/^(?:appel)/,/^(?:call)/,/^(?:anonymous)/,/^(?:anonyme)/,/^(?:the)/,/^(?:le)/,/^(?:la)/,/^(?:l')/,/^(?:les)/,/^(?:of)/,/^(?:du|de\s+la|des|de\s+l')/,/^(?:pour)/,/^(?:for)/,/^(?:a|an|some)/,/^(?:un|une|des)/,/^(?:à\s+la|au|à\s+l')/,/^(?:to)/,/^(?:Les appels)/,/^(?:sur le réseau)/,/^(?:vers les fixes)/,/^(?:vers les mobiles)/,/^(?:vers les fixes et les mobiles)/,/^(?:vers)/,/^(?:en)/,/^(?:Appel illimités)/,/^(?:dans la limite de)/,/^(?:au plus)/,/^(?:jusqu'à)/,/^(?:heures)/,/^(?:mensuels)/,/^(?:mensuelles)/,/^(?:destinataires)/,/^(?:différents)/,/^(?:différentes)/,/^(?:par mois)/,/^(?:par facture)/,/^(?:sont gratuits)/,/^(?:par appel)/,/^(?:par jour)/,/^(?:par heure)/,/^(?:par semaine)/,/^(?:par jour de la semaine)/,/^(?:heure)/,/^(?:heures)/,/^(?:minute)/,/^(?:minutes)/,/^(?:seconde)/,/^(?:secondes)/,/^(?:France métropolitaine)/,/^(?:Allemagne)/,/^(?:Royaume-Uni)/,/^(?:Argentine)/,/^(?:Australie)/,/^(?:Autriche)/,/^(?:Baléares)/,/^(?:Belgique)/,/^(?:Brésil)/,/^(?:Canada)/,/^(?:Chili)/,/^(?:Chine)/,/^(?:Chypre)/,/^(?:Colombie)/,/^(?:Danemark)/,/^(?:Écosse)/,/^(?:Espagne)/,/^(?:Estonie)/,/^(?:France métropolitaine)/,/^(?:Grèce)/,/^(?:Guam)/,/^(?:Hong-Kong)/,/^(?:Hongrie)/,/^(?:Iles Vierges \(U\.S\.\))/,/^(?:Islande)/,/^(?:Irlande)/,/^(?:Irlande du Nord)/,/^(?:Israël)/,/^(?:Italie)/,/^(?:Kazakhstan)/,/^(?:Lettonie)/,/^(?:Luxembourg)/,/^(?:Malaisie)/,/^(?:Mexique)/,/^(?:Norvège)/,/^(?:Nouvelle Zélande)/,/^(?:Panama)/,/^(?:Pays Bas)/,/^(?:Pays de Galles)/,/^(?:Pologne)/,/^(?:Portugal)/,/^(?:Pérou)/,/^(?:Russie)/,/^(?:Singapour)/,/^(?:Slovaquie)/,/^(?:Suisse)/,/^(?:Suède)/,/^(?:Taïwan)/,/^(?:Thaïlande)/,/^(?:USA)/,/^(?:Vatican)/,/^(?:[;])/,/^(?:[,])/,/^(?:[.])/,/^(?:[\w-]+)/,/^(?:[;])/,/^(?:[.])/,/^(?:\w+)/,/^(?:$)/,/^(?:\{.*\})/,/^(?:.)/,/^(?:.)/],
-conditions: {"en":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,30,32,35,37,39,43,44,46,51,54,55,58,145,146,147,148,149,150,151],"inclusive":true},"fr":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,31,33,34,36,38,40,41,42,45,47,48,49,50,52,53,56,57,145,146,147,148,149,150,151],"inclusive":true},"frcgu":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151],"inclusive":true},"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,145,146,147,148,149,150,151],"inclusive":true}}
+rules: [/^(?:#[^\r\n]*?[\r\n])/,/^(?:menu)/,/^(?:ornaments)/,/^(?:ornament)/,/^(?:statement)/,/^(?:$)/,/^(?:.)/,/^(?:menu)/,/^(?:if)/,/^(?:then)/,/^(?:and)/,/^(?:&&)/,/^(?:not)/,/^(?:!)/,/^(?:end)/,/^(?:;)/,/^(?:\.)/,/^(?:([0-9]+\.(?:[0-9]+)?\b))/,/^(?:([0-9]+))/,/^(?:([']([^'\r\n]*)[']))/,/^(?:(["]([^"\r\n]*)["]))/,/^(?:([\/](\d|\?|\.|\.\.|\.\.\.|)+[\/]))/,/^(?:\w+)/,/^(?:\s+)/,/^(?:$)/,/^(?:.)/,/^(?:.)/],
+conditions: {"simple":{"rules":[7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25],"inclusive":false},"INITIAL":{"rules":[0,1,2,3,4,5,6,26],"inclusive":true}}
 });
 return lexer;
 })();
@@ -1056,7 +707,7 @@ if (typeof require !== 'undefined' && typeof exports !== 'undefined') {
 exports.parser = language;
 exports.Parser = language.Parser;
 exports.parse = function () { return language.parse.apply(language, arguments); };
-exports.main = function commonjsMain(args) {
+exports.main = function commonjsMain (args) {
     if (!args[1]) {
         console.log('Usage: '+args[0]+' FILE');
         process.exit(1);
