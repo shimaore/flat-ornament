@@ -136,6 +136,7 @@ expression
   | IF expression THEN expression ELSE expression -> async function (ctx) { var cond = await $2.call(this,ctx); if (cond) { return $4.call(this,ctx) } else { return $6(ctx) } }
   | '(' expression ')'            -> $2
   | '[' parameters ']'            -> async function (ctx) { return await Promise.all($2.map( (a) => a.call(this,ctx) )); }
+  | '[' ']'                       -> function (ctx) { return [] }
   ;
 
 parameters
