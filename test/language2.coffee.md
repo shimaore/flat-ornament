@@ -8,14 +8,14 @@
         {Parser} = require '../language2'
         parser = new Parser()
         parser.yy.op =
-          postpone: (x) ->
+          promise: (x) ->
             Promise.resolve x
           sqrt: (x) -> Math.sqrt x
-          get: (n) -> this[n]
-          set: (n,v) -> this[n] = v
-          animal: -> this.ant
+          get: (n) -> this.get n
+          set: (n,v) -> this.set(n, v); v
+          animal: -> this.get 'ant'
 
-        state = bear: 4, ant: 3
+        state = new Map [['bear',4], ['ant',3]]
         pp = (x) -> (parser.parse x).call state
         it 'should parse integer', ->
           expect(await pp '3').to.equal 3
@@ -33,11 +33,11 @@
           expect(await pp '-3+4').to.equal 1
         it 'should do function call', ->
           expect(await pp 'sqrt(49)').to.equal 7
-          expect(await pp '3+postpone(4)').to.equal 7
-          expect(await pp 'postpone(3) and postpone(4)').to.equal 4
+          expect(await pp '3+promise(4)').to.equal 7
+          expect(await pp 'promise(3) and promise(4)').to.equal 4
         it 'should do variables', ->
           expect(await pp 'foo = "hello ", foo + "world"').to.equal 'hello world'
-          expect(await pp 'foo = "hello ", postpone(foo + "world")').to.equal 'hello world'
+          expect(await pp 'foo = "hello ", promise(foo + "world")').to.equal 'hello world'
           expect(await pp '
             a = 1,
             b = 3,
@@ -47,7 +47,7 @@
         it 'should do conditionals', ->
           expect(await pp '
             foo = "hello ",
-            if sqrt(42) > 5 then postpone(foo + "world") else "pooh"
+            if sqrt(42) > 5 then promise(foo + "world") else "pooh"
           ').to.equal 'hello world'
           expect(await pp '
             if 3 > 4 then "ok" else "no"
@@ -81,14 +81,25 @@
           expect(await pp '
             set("bear",42)
           ').to.equal 42
-          state.should.have.property 'bear', 42
+          expect(state.get 'bear').to.equal 42
           expect(await pp '
             a = 3,
             b = true,
             if b then set("dog",get("bear")*a)
           ').to.equal 126
-          state.should.have.property 'bear', 42
-          state.should.have.property 'dog', 126
+          expect(state.get 'bear').to.equal 42
+          expect(state.get 'dog').to.equal 126
           expect(await pp '
             animal
-          ').to.equal state.ant
+          ').to.equal state.get 'ant'
+
+        it 'should postpone', ->
+          expect(await pp '
+            close = postpone ( a = 2*b, a+c ),
+            close( b: 4, c: 10 )
+          ').to.equal 2*4+10
+        it 'should postpone and accept parameter evaluation', ->
+          expect(await pp '
+            close = postpone ( a = 2*b, a+c ),
+            close( b: 43*get("ant"), c: 10 )
+          ').to.equal 2*43*state.get('ant')+10
