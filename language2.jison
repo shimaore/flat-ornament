@@ -154,7 +154,7 @@ expression
   | expression UNLESS expression                  -> async function (ctx) { var cond = await $3.call(this,ctx); if (!cond) return $1.call(this,ctx); }
   | IF expression THEN expression ELSE expression -> async function (ctx) { var cond = await $2.call(this,ctx); if (cond) { return $4.call(this,ctx) } else { return $6(ctx) } }
   | UNLESS expression THEN expression ELSE expression -> async function (ctx) { var cond = await $2.call(this,ctx); if (!cond) { return $4.call(this,ctx) } else { return $6(ctx) } }
-  | '(' expression ')'            -> $2
+  | '(' expressions ')'           -> $2
   | '[' parameters ']'            -> async function (ctx) { return await Promise.all($2.map( (a) => a.call(this,ctx) )); }
   | '[' ']'                       -> function (ctx) { return [] }
   ;
