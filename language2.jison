@@ -141,9 +141,9 @@ expression
   | '+' expression  %prec UMINUS  -> async function (ctx) { return + await $2.call(this,ctx) }
   | pattern  expresion            -> async function (ctx) { var a = await $1.call(this,ctx); return (typeof a === 'string') && a.match($2); }
   | expression '~' pattern        -> async function (ctx) { var a = await $1.call(this,ctx); return (typeof a === 'string') && a.match($3); }
-  | op '(' parameters ')'         -> async function (ctx) { var args = await Promise.all($3.map( (a) => a.call(this,ctx) )); return $1.apply(this,args); }
-  | name '(' parameters ')'       -> async function (ctx) { var args = await Promise.all($3.map( (a) => a.call(this,ctx) )); return ctx.get($1).apply(this,args); }
-  | name '(' pairs ')'            -> async function (ctx) { var pairs = await Promise.all($3.map( ([k,v]) => [k,v.call(this,ctx)] )); return ctx.get($1).call(this,new Map(pairs)); }
+  | op '(' parameters ')'         -> async function (ctx) { var self = this; var args = await Promise.all($3.map( async function (a) { return await a.call(self,ctx) })); return $1.apply(this,args); }
+  | name '(' parameters ')'       -> async function (ctx) { var self = this; var args = await Promise.all($3.map( async function (a) { return await a.call(self,ctx) })); return ctx.get($1).apply(this,args); }
+  | name '(' pairs ')'            -> async function (ctx) { var self = this; var pairs = await Promise.all($3.map( async function ([k,v]) { return [k,await v.call(self,ctx)] })); return ctx.get($1).call(this,new Map(pairs)); }
   | op '(' ')'                    -> function (ctx) { return $1.call(this); }
   | op                            -> function (ctx) { return $1.call(this); }
   | THE op                        -> function (ctx) { return $2.call(this); }
