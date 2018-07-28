@@ -47,6 +47,9 @@ NAME        [A-Za-z][\w-]*
 "than"          return 'THAN'
 "the"           return 'THE'
 "of"            return 'OF'
+"postpone"      return 'POSTPONE'
+"→"             return 'POSTPONE'
+"->"            return 'POSTPONE'
 
 {FLOAT}         return 'FLOAT'
 {INTEGER}       return 'INTEGER'
@@ -72,6 +75,7 @@ const pattern = require ('./pattern');
 /* operator association and precedence, if any */
 
 %left ','
+%right POSTPONE
 %right '='
 %right IF UNLESS
 %left THEN ELSE
@@ -110,6 +114,7 @@ expression
   | string                        -> function (ctx) { return $1 }
   | TRUE                          -> function (ctx) { return true }
   | FALSE                         -> function (ctx) { return false }
+  | POSTPONE expression           -> function (ctx) { return $2 }
   | expression AND expression     -> async function (ctx) { var cond = await $1.call(this,ctx); return cond && $3.call(this,ctx) }
   | expression OR  expression     -> async function (ctx) { var cond = await $1.call(this,ctx); return cond || $3.call(this,ctx) }
   | NOT expression                -> async function (ctx) { return ! await $2.call(this,ctx) }
