@@ -147,6 +147,7 @@ expression
   | name '(' pairs ')'            -> async function (ctx) { var pairs = await Promise.all($3.map( ([k,v]) => [k,v.call(this,ctx)] )); return ctx.get($1).call(this,new Map(pairs)); }
   | op '(' ')'                    -> function (ctx) { return $1.call(this); }
   | op                            -> function (ctx) { return $1.call(this); }
+  | THE op                        -> function (ctx) { return $2.call(this); }
   | IF expression THEN expression                 -> async function (ctx) { var cond = await $2.call(this,ctx); if (cond) return $4.call(this,ctx); }
   | UNLESS expression THEN expression             -> async function (ctx) { var cond = await $2.call(this,ctx); if (!cond) return $4.call(this,ctx); }
   | expression IF expression                      -> async function (ctx) { var cond = await $3.call(this,ctx); if (cond) return $1.call(this,ctx); }
