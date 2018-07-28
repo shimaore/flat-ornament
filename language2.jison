@@ -62,6 +62,7 @@ NAME        [A-Za-z][\w-]*
 %{
 
 const Immutable = require('immutable');
+const pattern = require ('./pattern');
 
 %}
 
@@ -163,7 +164,7 @@ string
   ;
 
 pattern
-  : PATTERN   -> new RegExp(yytext.substr(1,yytext.length-2))
+  : PATTERN   -> pattern(yytext.substr(1,yytext.length-2))
   ;
 
 name
