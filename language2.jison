@@ -127,6 +127,7 @@ expression
   | THE name OF expression        -> async function (ctx) { var a = await $4.call(this,ctx); if (a.hasOwnProperty($2)) { return a[$2] }; if ($2 === 'length') { return a.length } }
   | expression '[' integer ']'    -> async function (ctx) { var a = await $1.call(this,ctx); if (a.hasOwnProperty($3)) { return a[$3] }; }
   | '-' expression  %prec UMINUS  -> async function (ctx) { return - await $2.call(this,ctx) }
+  | pattern  expresion            -> async function (ctx) { var a = await $1.call(this,ctx); return (typeof a === 'string') && a.match($2); }
   | expression '~' pattern        -> async function (ctx) { var a = await $1.call(this,ctx); return (typeof a === 'string') && a.match($3); }
   | op '(' parameters ')'         -> async function (ctx) { var args = await Promise.all($3.map( (a) => a.call(this,ctx) )); return $1.apply(this,args); }
   | op '(' ')'                    -> function (ctx) { return $1.call(this); }
