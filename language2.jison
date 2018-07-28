@@ -136,7 +136,7 @@ expression
   | expression ISNT expression    -> async function (ctx) { var a = await $1.call(this,ctx); return a !== await $3.call(this,ctx) }
   | THE name OF expression        -> async function (ctx) { var a = await $4.call(this,ctx); if ($2 === 'length') { return a.length }; return a.get($2) }
   | expression '.' name           -> async function (ctx) { var a = await $1.call(this,ctx); if ($3 === 'length') { return a.length }; return a.get($3) }
-  | expression '[' integer ']'    -> async function (ctx) { var a = await $1.call(this,ctx); if (a.hasOwnProperty($3)) { return a[$3] }; }
+  | expression '[' integer ']'    -> async function (ctx) { var a = await $1.call(this,ctx); return a[$3] }
   | '-' expression  %prec UMINUS  -> async function (ctx) { return - await $2.call(this,ctx) }
   | '+' expression  %prec UMINUS  -> async function (ctx) { return + await $2.call(this,ctx) }
   | pattern  expresion            -> async function (ctx) { var a = await $1.call(this,ctx); return (typeof a === 'string') && a.match($2); }
