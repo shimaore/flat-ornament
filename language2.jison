@@ -98,9 +98,8 @@ start
 
 expressions
   : assignment ',' expressions     -> async function (ctx) { var ctx = await $1.call(this,ctx); return $3.call(this,ctx); }
-  | expression ',' expressions     -> async function (ctx) { var it = await $1.call(this,ctx); return $3.call(this,ctx); }
+  | expression ',' expressions     -> async function (ctx) { await $1.call(this,ctx); return $3.call(this,ctx); }
   | expression -> $1
-  | '{' expressions '}' -> $2
   ;
 
 assignment
