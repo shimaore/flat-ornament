@@ -71,19 +71,19 @@ const pattern = require ('./pattern');
 
 /* operator association and precedence, if any */
 
+%left ','
+%right '='
 %right IF UNLESS
 %left THEN ELSE
-%left AND
 %left OR
-%left NOT
+%left AND
 %left IS ISNT '~' EQ NE MATCH
 %left '<' '>' GE LE
+/* bitwise */
 %left '+' '-'
 %left '*' '/' '%'
-%left '^'
-%left '['
-%left UMINUS
-%left OF
+%right NOT UMINUS
+%left OF '[' '.'
 
 %% /* grammar */
 
