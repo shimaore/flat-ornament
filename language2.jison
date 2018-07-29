@@ -144,12 +144,12 @@ expression
   | '+' expression  %prec UMINUS  -> async function (rtx,ctx) { return + await $2(rtx,ctx) }
   | pattern  expresion            -> async function (rtx,ctx) { var a = await $2(rtx,ctx); return (typeof a === 'string') && a.match($1); }
   | expression '~' pattern        -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return (typeof a === 'string') && a.match($3); }
-  | IF expression THEN expression                 -> async function (ctx) { var cond = await $2.call(this,ctx); if (cond) return $4.call(this,ctx); }
-  | UNLESS expression THEN expression             -> async function (ctx) { var cond = await $2.call(this,ctx); if (!cond) return $4.call(this,ctx); }
-  | expression IF expression                      -> async function (ctx) { var cond = await $3.call(this,ctx); if (cond) return $1.call(this,ctx); }
-  | expression UNLESS expression                  -> async function (ctx) { var cond = await $3.call(this,ctx); if (!cond) return $1.call(this,ctx); }
-  | IF expression THEN expression ELSE expression -> async function (ctx) { var cond = await $2.call(this,ctx); if (cond) { return $4.call(this,ctx) } else { return $6(ctx) } }
-  | UNLESS expression THEN expression ELSE expression -> async function (ctx) { var cond = await $2.call(this,ctx); if (!cond) { return $4.call(this,ctx) } else { return $6(ctx) } }
+  | IF expression THEN expression                 -> async function (rtx,ctx) { var cond = await $2(rtx,ctx); if ( cond) return $4(rtx,ctx); }
+  | UNLESS expression THEN expression             -> async function (rtx,ctx) { var cond = await $2(rtx,ctx); if (!cond) return $4(rtx,ctx); }
+  | expression IF expression                      -> async function (rtx,ctx) { var cond = await $3(rtx,ctx); if ( cond) return $1(rtx,ctx); }
+  | expression UNLESS expression                  -> async function (rtx,ctx) { var cond = await $3(rtx,ctx); if (!cond) return $1(rtx,ctx); }
+  | IF expression THEN expression ELSE expression     -> async function (rtx,ctx) { var cond = await $2(rtx,ctx); if ( cond) { return $4(rtx,ctx) } else { return $6(rtx,ctx) } }
+  | UNLESS expression THEN expression ELSE expression -> async function (rtx,ctx) { var cond = await $2(rtx,ctx); if (!cond) { return $4(rtx,ctx) } else { return $6(rtx,ctx) } }
   | '(' expressions ')'           -> $2
   | '[' parameters ']'            -> async function (ctx) { return await Promise.all($2.map( (a) => a.call(this,ctx) )); }
   | '[' ']'                       -> function (ctx) { return [] }
