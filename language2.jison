@@ -66,6 +66,9 @@ NAME        [A-Za-z_]+
 
 const Immutable = require('immutable');
 const pattern = require ('./pattern');
+const is_function = function (f) { return 'function' === typeof f }
+const reject_function = function (n,v) { if(is_function(v)) throw new Error(`Parameter ${n} might not be a function.`); return v; }
+const need_function = function (n,f) { if(!is_function(f)) throw new Error(`${n} should be a function.`); return f; }
 
 %}
 
@@ -139,7 +142,7 @@ expression
   | pattern  expresion            -> async function (rtx,ctx) { var a = await $2(rtx,ctx); return (typeof a === 'string') && a.match($1); }
   | expression '~' pattern        -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return (typeof a === 'string') && a.match($3); }
   | op '(' parameters ')'         -> async function (rtx,ctx) { var args  = await Promise.all($3.map( async function (a) { return await a(rtx,ctx) })); return $1.apply(rtx,args); }
-  | name '(' pairs ')'            -> async function (rtx,ctx) { var pairs = await Promise.all($3.map( async function ([k,a]) { return [k,await a(rtx,ctx)] })); return ctx.get($1)(rtx,new Map(pairs)); }
+  | name '(' pairs ')'            -> async function (rtx,ctx) { var f = need_function($1,ctx.get($1)); var pairs = await Promise.all($3.map( async function ([k,a]) { var v = await a(rtx,ctx); return [k,reject_function(k,v)] })); return f(rtx,Immutable.Map(pairs)); }
   | op '(' ')'                    -> function (rtx,ctx) { return $1.apply(rtx); }
   | op                            -> function (rtx,ctx) { return $1.apply(rtx); }
   | THE op                        -> function (rtx,ctx) { return $2.apply(rtx); }

@@ -1,5 +1,5 @@
-    {expect} = chai = require 'chai'
-    chai.should()
+    ({expect} = chai = require 'chai').should()
+    chai.use(require 'chai-as-promised')
 
     describe 'Language 2', ->
       it 'should load', ->
@@ -106,13 +106,51 @@
             close( b: 4, c: 10 )
           ').to.equal 2*4+10
         it 'should postpone and accept parameter evaluation', ->
-          expect(await pp '
+          await (pp '
             close = postpone ( a = 2*b, a+c ),
             close( b: 43*get("ant"), c: 10 )
-          ').to.equal 2*43*state.get('ant')+10
+          ').should.eventually.equal 2*43*state.get('ant')+10
+          await (pp '
+            mul = → a*b,
+            add = → a+b,
+            add(a:3,b:4)
+          ').should.eventually.equal 3+4
+          await (pp '
+            mul = → a*b,
+            add = → a+b,
+            mul(a:3,b:4)
+          ').should.eventually.equal 3*4
+          await (pp '
+            mul = → a*b,
+            add = → a+b,
+            mul(a:3,b:add(a:1,b:3))
+          ').should.eventually.equal 3*4
+          await (pp '
+            mul = → a*b,
+            add = → a+b,
+            mul( a:add(a:3,b:4), b:add(a:6,b:8) )
+          ').should.eventually.equal (3+4)*(6+8)
 
-        it 'should recurse', ->
-          expect(await pp '
+The language is complex enough to support recursion.
+Of course since the goal is to process calls and not let outsiders bring the system down, that's probably too much power.
+(Essentially we're trying to build a language in which termination is decidable.)
+
+        it 'should not recurse (Peter-Ackermann)', ->
+          (pp '
+            A = →
+              if m is 0 then n+1 else
+              if m > 0 and n is 0 then A(A:A,m:m-1,n:n-1) else
+              if m > 0 and n > 0 then A(A:A,m:m-1,n:A(A:A,m:m,n:n-1)),
+
+            A(A:A,m:4,n:3)
+          ').should.be.rejected
+        it 'should not recurse (factorial 1)', ->
+          (pp '
             fact = → if n > 0 then n*fact(fact:fact,n:n-1) else 1,
-            fact(fact:fact, n:4)
-          ').to.equal 4*3*2
+            fact(fact:fact, n:1)
+          ').should.be.rejected
+        it 'should not recurse (factorial 10000)', ->
+          (pp '
+            fact = → if n > 0 then n*fact(fact:fact,n:n-1) else 1,
+            fact(fact:fact, n:10000)
+          ').should.be.rejected
