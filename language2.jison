@@ -132,7 +132,6 @@ expression
   | expression NE expression      -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return a !== await $3(rtx,ctx) }
   | expression ISNT expression    -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return a !== await $3(rtx,ctx) }
   | op '(' parameters ')'         -> async function (ctx) { var self = this; var args = await Promise.all($3.map( async function (a) { return await a.call(self,ctx) })); return $1.apply(this,args); }
-  | name '(' parameters ')'       -> async function (ctx) { var self = this; var args = await Promise.all($3.map( async function (a) { return await a.call(self,ctx) })); return ctx.get($1).apply(this,args); }
   | name '(' pairs ')'            -> async function (ctx) { var self = this; var pairs = await Promise.all($3.map( async function ([k,v]) { return [k,await v.call(self,ctx)] })); return ctx.get($1).call(this,new Map(pairs)); }
   | op '(' ')'                    -> function (ctx) { return $1.call(this); }
   | op                            -> function (ctx) { return $1.call(this); }
