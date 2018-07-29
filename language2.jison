@@ -78,7 +78,7 @@ const pattern = require ('./pattern');
 %left THEN ELSE
 %left OR
 %left AND
-%left IS ISNT '~' EQ NE MATCH
+%left IS ISNT '~' EQ NE
 %left '<' '>' GE LE
 /* bitwise */
 %left '+' '-'
