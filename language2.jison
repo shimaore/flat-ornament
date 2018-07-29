@@ -119,18 +119,18 @@ expression
   | expression '*' expression     -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return a * await $3(rtx,ctx) }
   | expression '/' expression     -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return a / await $3(rtx,ctx) }
   | expression '%' expression     -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return a % await $3(rtx,ctx) }
-  | expression '>' expression                 -> async function (ctx) { var a = await $1.call(this,ctx); return a > await $3.call(this,ctx) }
-  | expression GE expression                  -> async function (ctx) { var a = await $1.call(this,ctx); return a >= await $3.call(this,ctx) }
-  | expression IS GREATER THAN expression     -> async function (ctx) { var a = await $1.call(this,ctx); return a > await $5.call(this,ctx) }
-  | expression IS NOT GREATER THAN expression -> async function (ctx) { var a = await $1.call(this,ctx); return !(a > await $5.call(this,ctx)) }
-  | expression '<' expression                 -> async function (ctx) { var a = await $1.call(this,ctx); return a < await $3.call(this,ctx) }
-  | expression LE expression                  -> async function (ctx) { var a = await $1.call(this,ctx); return a <= await $3.call(this,ctx) }
-  | expression IS LESS THAN expression     -> async function (ctx) { var a = await $1.call(this,ctx); return a < await $5.call(this,ctx) }
-  | expression IS NOT LESS THAN expression -> async function (ctx) { var a = await $1.call(this,ctx); return !(a < await $5.call(this,ctx)) }
-  | expression EQ expression      -> async function (ctx) { var a = await $1.call(this,ctx); return a === await $3.call(this,ctx) }
-  | expression IS expression      -> async function (ctx) { var a = await $1.call(this,ctx); return a === await $3.call(this,ctx) }
-  | expression NE expression      -> async function (ctx) { var a = await $1.call(this,ctx); return a !== await $3.call(this,ctx) }
-  | expression ISNT expression    -> async function (ctx) { var a = await $1.call(this,ctx); return a !== await $3.call(this,ctx) }
+  | expression '>' expression                 -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return a > await $3(rtx,ctx) }
+  | expression GE expression                  -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return a >= await $3(rtx,ctx) }
+  | expression IS GREATER THAN expression     -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return a > await $5(rtx,ctx) }
+  | expression IS NOT GREATER THAN expression -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return !(a > await $5(rtx,ctx)) }
+  | expression '<' expression                 -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return a < await $3(rtx,ctx) }
+  | expression LE expression                  -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return a <= await $3(rtx,ctx) }
+  | expression IS LESS THAN expression     -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return a < await $5(rtx,ctx) }
+  | expression IS NOT LESS THAN expression -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return !(a < await $5(rtx,ctx)) }
+  | expression EQ expression      -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return a === await $3(rtx,ctx) }
+  | expression IS expression      -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return a === await $3(rtx,ctx) }
+  | expression NE expression      -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return a !== await $3(rtx,ctx) }
+  | expression ISNT expression    -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return a !== await $3(rtx,ctx) }
   | THE name OF expression        -> async function (ctx) { var a = await $4.call(this,ctx); if ($2 === 'length') { return a.length }; return a.get($2) }
   | expression '.' name           -> async function (ctx) { var a = await $1.call(this,ctx); if ($3 === 'length') { return a.length }; return a.get($3) }
   | expression '[' integer ']'    -> async function (ctx) { var a = await $1.call(this,ctx); return a[$3] }
