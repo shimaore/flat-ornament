@@ -4,11 +4,9 @@
   // -------------
 
   // This is the legacy parser for flat-ornament. It supports ornaments stored as a data structure, including where parts of the data structure are replaced by strings, which are parsed using the simple language defined in `language.jison`, which was meant to generate content identical to the data structure. (This was originally meant to allow tools to go back-and-forth between the data structure and the textual representations.)
-  var ID, NOT, NOTHING, Parser, compile, compile_ornament, compile_statement, debug, parser, run;
+  var ID, NOT, NOTHING, Parser, compile, compile_ornament, compile_statement, parser, run;
 
   ({name: this.name} = require('./package'));
-
-  debug = (require('tangible'))(this.name);
 
   ({Parser} = require('./language'));
 
