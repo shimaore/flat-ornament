@@ -89,28 +89,28 @@ const pattern = require ('./pattern');
 %% /* grammar */
 
 start
-  : expressions EOF  { return function () { return $1.call(this,Immutable.Map()) /* evaluate */ } }
+  : expressions EOF  { return function () { return $1(this,Immutable.Map()) /* evaluate */ } }
   |                  { return function () {} }
   ;
 
 expressions
-  : assignment ',' expressions     -> async function (ctx) { var ctx = await $1.call(this,ctx); return $3.call(this,ctx); }
-  | expression ',' expressions     -> async function (ctx) { await $1.call(this,ctx); return $3.call(this,ctx); }
+  : assignment ',' expressions     -> async function (rtx,ctx) { var ctx = await $1(rtx,ctx); return $3(rtx,ctx); }
+  | expression ',' expressions     -> async function (rtx,ctx) { await $1(rtx,ctx); return $3(rtx,ctx); }
   | expression -> $1
   ;
 
 assignment
-  : name '=' expression  -> async function (ctx) { var name = $1; var val = await $3.call(this,ctx); return ctx.set(name,val); }
+  : name '=' expression  -> async function (rtx,ctx) { var name = $1; var val = await $3(rtx,ctx); return ctx.set(name,val); }
   ;
 
 expression
-  : name                          -> function (ctx) { return ctx.get($1) }
-  | float                         -> function (ctx) { return $1 }
-  | integer                       -> function (ctx) { return $1 }
-  | string                        -> function (ctx) { return $1 }
-  | TRUE                          -> function (ctx) { return true }
-  | FALSE                         -> function (ctx) { return false }
-  | POSTPONE expression           -> function (ctx) { return $2 }
+  : name                          -> function (rtx,ctx) { return ctx.get($1) }
+  | float                         -> function (rtx,ctx) { return $1 }
+  | integer                       -> function (rtx,ctx) { return $1 }
+  | string                        -> function (rtx,ctx) { return $1 }
+  | TRUE                          -> function (rtx,ctx) { return true }
+  | FALSE                         -> function (rtx,ctx) { return false }
+  | POSTPONE expression           -> function (rtx,ctx) { return $2 }
   | expression AND expression     -> async function (ctx) { var cond = await $1.call(this,ctx); return cond && $3.call(this,ctx) }
   | expression OR  expression     -> async function (ctx) { var cond = await $1.call(this,ctx); return cond || $3.call(this,ctx) }
   | NOT expression                -> async function (ctx) { return ! await $2.call(this,ctx) }
