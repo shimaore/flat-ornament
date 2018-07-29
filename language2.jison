@@ -13,9 +13,6 @@ NAME        [A-Za-z][\w-]*
 
 %options flex
 
-/* Exclusive states */
-%x simple frcgu
-
 %%
 
 
