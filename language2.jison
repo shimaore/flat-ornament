@@ -131,11 +131,6 @@ expression
   | expression IS expression      -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return a === await $3(rtx,ctx) }
   | expression NE expression      -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return a !== await $3(rtx,ctx) }
   | expression ISNT expression    -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return a !== await $3(rtx,ctx) }
-  | op '(' parameters ')'         -> async function (ctx) { var self = this; var args = await Promise.all($3.map( async function (a) { return await a.call(self,ctx) })); return $1.apply(this,args); }
-  | name '(' pairs ')'            -> async function (ctx) { var self = this; var pairs = await Promise.all($3.map( async function ([k,v]) { return [k,await v.call(self,ctx)] })); return ctx.get($1).call(this,new Map(pairs)); }
-  | op '(' ')'                    -> function (ctx) { return $1.call(this); }
-  | op                            -> function (ctx) { return $1.call(this); }
-  | THE op                        -> function (ctx) { return $2.call(this); }
   | THE name OF expression        -> async function (rtx,ctx) { var a = await $4(rtx,ctx); if ($2 === 'length') { return a.length }; return a.get($2) }
   | expression '.' name           -> async function (rtx,ctx) { var a = await $1(rtx,ctx); if ($3 === 'length') { return a.length }; return a.get($3) }
   | expression '[' integer ']'    -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return a[$3] }
@@ -143,6 +138,11 @@ expression
   | '+' expression  %prec UMINUS  -> async function (rtx,ctx) { return + await $2(rtx,ctx) }
   | pattern  expresion            -> async function (rtx,ctx) { var a = await $2(rtx,ctx); return (typeof a === 'string') && a.match($1); }
   | expression '~' pattern        -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return (typeof a === 'string') && a.match($3); }
+  | op '(' parameters ')'         -> async function (rtx,ctx) { var args  = await Promise.all($3.map( async function (a) { return await a(rtx,ctx) })); return $1.apply(rtx,args); }
+  | name '(' pairs ')'            -> async function (rtx,ctx) { var pairs = await Promise.all($3.map( async function ([k,a]) { return [k,await a(rtx,ctx)] })); return ctx.get($1)(rtx,new Map(pairs)); }
+  | op '(' ')'                    -> function (rtx,ctx) { return $1.apply(rtx); }
+  | op                            -> function (rtx,ctx) { return $1.apply(rtx); }
+  | THE op                        -> function (rtx,ctx) { return $2.apply(rtx); }
   | IF expression THEN expression                 -> async function (rtx,ctx) { var cond = await $2(rtx,ctx); if ( cond) return $4(rtx,ctx); }
   | UNLESS expression THEN expression             -> async function (rtx,ctx) { var cond = await $2(rtx,ctx); if (!cond) return $4(rtx,ctx); }
   | expression IF expression                      -> async function (rtx,ctx) { var cond = await $3(rtx,ctx); if ( cond) return $1(rtx,ctx); }
