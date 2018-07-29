@@ -4,7 +4,6 @@ Legacy parser
 This is the legacy parser for flat-ornament. It supports ornaments stored as a data structure, including where parts of the data structure are replaced by strings, which are parsed using the simple language defined in `language.jison`, which was meant to generate content identical to the data structure. (This was originally meant to allow tools to go back-and-forth between the data structure and the textual representations.)
 
     {@name} = require './package'
-    debug = (require 'tangible') @name
 
     {Parser} = require './language'
 
