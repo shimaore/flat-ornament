@@ -17,6 +17,7 @@
 
         state = new Map [['bear',4], ['ant',3]]
         pp = (x) -> (parser.parse x).call state
+
         it 'should parse integer', ->
           expect(await pp '3').to.equal 3
         it 'should parse booleans', ->
@@ -44,6 +45,12 @@
             c = 6.7,
             a+b+c
           ').to.equal 10.7
+          expect(await pp '
+            n = 2,
+            n = n-1,
+            n = n+4,
+            n*5
+          ').to.equal 25
         it 'should do conditionals', ->
           expect(await pp '
             foo = "hello ",
@@ -103,3 +110,9 @@
             close = postpone ( a = 2*b, a+c ),
             close( b: 43*get("ant"), c: 10 )
           ').to.equal 2*43*state.get('ant')+10
+
+        it 'should recurse', ->
+          expect(await pp '
+            fact = → if n > 0 then n*fact(fact:fact,n:n-1) else 1,
+            fact(fact:fact, n:4)
+          ').to.equal 4*3*2
