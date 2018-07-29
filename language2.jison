@@ -151,8 +151,8 @@ expression
   | IF expression THEN expression ELSE expression     -> async function (rtx,ctx) { var cond = await $2(rtx,ctx); if ( cond) { return $4(rtx,ctx) } else { return $6(rtx,ctx) } }
   | UNLESS expression THEN expression ELSE expression -> async function (rtx,ctx) { var cond = await $2(rtx,ctx); if (!cond) { return $4(rtx,ctx) } else { return $6(rtx,ctx) } }
   | '(' expressions ')'           -> $2
-  | '[' parameters ']'            -> async function (ctx) { return await Promise.all($2.map( (a) => a.call(this,ctx) )); }
-  | '[' ']'                       -> function (ctx) { return [] }
+  | '[' parameters ']'            -> async function (rtx,ctx) { return await Promise.all($2.map( async function (a) { return await a(rtx,ctx) })); }
+  | '[' ']'                       -> function (rtx,ctx) { return [] }
   ;
 
 parameters
