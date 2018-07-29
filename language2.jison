@@ -111,14 +111,14 @@ expression
   | TRUE                          -> function (rtx,ctx) { return true }
   | FALSE                         -> function (rtx,ctx) { return false }
   | POSTPONE expression           -> function (rtx,ctx) { return $2 }
-  | expression AND expression     -> async function (ctx) { var cond = await $1.call(this,ctx); return cond && $3.call(this,ctx) }
-  | expression OR  expression     -> async function (ctx) { var cond = await $1.call(this,ctx); return cond || $3.call(this,ctx) }
-  | NOT expression                -> async function (ctx) { return ! await $2.call(this,ctx) }
-  | expression '+' expression     -> async function (ctx) { var a = await $1.call(this,ctx); return a + await $3.call(this,ctx) }
-  | expression '-' expression     -> async function (ctx) { var a = await $1.call(this,ctx); return a - await $3.call(this,ctx) }
-  | expression '*' expression     -> async function (ctx) { var a = await $1.call(this,ctx); return a * await $3.call(this,ctx) }
-  | expression '/' expression     -> async function (ctx) { var a = await $1.call(this,ctx); return a / await $3.call(this,ctx) }
-  | expression '%' expression     -> async function (ctx) { var a = await $1.call(this,ctx); return a % await $3.call(this,ctx) }
+  | expression AND expression     -> async function (rtx,ctx) { var cond = await $1(rtx,ctx); return cond && $3(rtx,ctx) }
+  | expression OR  expression     -> async function (rtx,ctx) { var cond = await $1(rtx,ctx); return cond || $3(rtx,ctx) }
+  | NOT expression                -> async function (rtx,ctx) { return ! await $2(rtx,ctx) }
+  | expression '+' expression     -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return a + await $3(rtx,ctx) }
+  | expression '-' expression     -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return a - await $3(rtx,ctx) }
+  | expression '*' expression     -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return a * await $3(rtx,ctx) }
+  | expression '/' expression     -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return a / await $3(rtx,ctx) }
+  | expression '%' expression     -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return a % await $3(rtx,ctx) }
   | expression '>' expression                 -> async function (ctx) { var a = await $1.call(this,ctx); return a > await $3.call(this,ctx) }
   | expression GE expression                  -> async function (ctx) { var a = await $1.call(this,ctx); return a >= await $3.call(this,ctx) }
   | expression IS GREATER THAN expression     -> async function (ctx) { var a = await $1.call(this,ctx); return a > await $5.call(this,ctx) }
