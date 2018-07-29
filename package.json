@@ -19,5 +19,21 @@
   },
   "dependencies": {
     "immutable": "^4.0.0-rc.9"
-  }
+  },
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/shimaore/flat-ornament.git"
+  },
+  "keywords": [
+    "embedded",
+    "language",
+    "ccnq4"
+  ],
+  "bugs": {
+    "url": "https://gitlab.com/shimaore/flat-ornament/issues"
+  },
+  "homepage": "https://gitlab.com/shimaore/flat-ornament#README"
 }
