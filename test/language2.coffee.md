@@ -159,6 +159,10 @@ Of course since the goal is to process calls and not let outsiders bring the sys
           (pp '
             the a of {a:3,b:4}
           ').should.eventually.equal 3
+        it 'should support objects size', ->
+          (pp '
+            the size of {a:3,b:4}
+          ').should.eventually.equal 2
         it 'should support complex objects', ->
           (pp '''
             the name of the owner of the dog of { dog: { name: 'Milou', owner: { name: 'Tintin' } } }
