@@ -47,6 +47,9 @@ NAME        [A-Za-z_]+
 "postpone"      return 'POSTPONE'
 "→"             return 'POSTPONE'
 "->"            return 'POSTPONE'
+"="             return 'ASSIGN'
+":"             return 'ASSIGN'
+"←"             return 'ASSIGN'
 
 {FLOAT}         return 'FLOAT'
 {INTEGER}       return 'INTEGER'
@@ -76,7 +79,7 @@ const need_function = function (n,f) { if(!is_function(f)) throw new Error(`${n}
 
 %left ','
 %right POSTPONE
-%right '='
+%right ASSIGN
 %right IF UNLESS
 %left THEN ELSE
 %left OR
@@ -103,7 +106,7 @@ expressions
   ;
 
 assignment
-  : name '=' expression  -> async function (rtx,ctx) { var name = $1; var val = await $3(rtx,ctx); return ctx.set(name,val); }
+  : name ASSIGN expression  -> async function (rtx,ctx) { var name = $1; var val = await $3(rtx,ctx); return ctx.set(name,val); }
   ;
 
 expression
@@ -154,7 +157,9 @@ expression
   | UNLESS expression THEN expression ELSE expression -> async function (rtx,ctx) { var cond = await $2(rtx,ctx); if (!cond) { return $4(rtx,ctx) } else { return $6(rtx,ctx) } }
   | '(' expressions ')'           -> $2
   | '[' parameters ']'            -> async function (rtx,ctx) { return await Promise.all($2.map( async function (a) { return await a(rtx,ctx) })); }
+  | '{' hash_pairs '}'            -> async function (rtx,ctx) { var pairs = await Promise.all($2.map( async function ([k,a]) { var v = await a(rtx,ctx); return [k,v] })); return Immutable.Map(pairs) }
   | '[' ']'                       -> function (rtx,ctx) { return [] }
+  | '{' '}'                       -> function (rtx,ctx) { return Immutable.Map() }
   ;
 
 parameters
@@ -172,7 +177,18 @@ pairs
   ;
 
 pair
-  : name ':' expression -> [$1,$3]
+  : name ASSIGN expression -> [$1,$3]
+  ;
+
+hash_pairs
+  : hash_pairs ',' hash_pair  -> $1.concat([$3])
+  | hash_pair                 -> [$1]
+  ;
+
+hash_pair
+  : name    ASSIGN expression -> [$1,$3]
+  | string  ASSIGN expression -> [$1,$3]
+  | integer ASSIGN expression -> [$1,$3]
   ;
 
 /* Constants */

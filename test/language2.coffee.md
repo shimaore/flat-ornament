@@ -103,32 +103,32 @@
         it 'should postpone', ->
           expect(await pp '
             close = postpone ( a = 2*b, a+c ),
-            close( b: 4, c: 10 )
+            close( b= 4, c: 10 )
           ').to.equal 2*4+10
         it 'should postpone and accept parameter evaluation', ->
           await (pp '
             close = postpone ( a = 2*b, a+c ),
-            close( b: 43*get("ant"), c: 10 )
+            close( b= 43*get("ant"), c: 10 )
           ').should.eventually.equal 2*43*state.get('ant')+10
           await (pp '
             mul = → a*b,
             add = → a+b,
-            add(a:3,b:4)
+            add(a=3,b:4)
           ').should.eventually.equal 3+4
           await (pp '
             mul = → a*b,
             add = → a+b,
-            mul(a:3,b:4)
+            mul(a:3,b=4)
           ').should.eventually.equal 3*4
           await (pp '
             mul = → a*b,
             add = → a+b,
-            mul(a:3,b:add(a:1,b:3))
+            mul(a:3,b=add(a=1,b:3))
           ').should.eventually.equal 3*4
           await (pp '
             mul = → a*b,
             add = → a+b,
-            mul( a:add(a:3,b:4), b:add(a:6,b:8) )
+            mul( a:add(a=3,b=4), b=add(b:8,a=6) )
           ').should.eventually.equal (3+4)*(6+8)
 
 The language is complex enough to support recursion.
@@ -154,3 +154,24 @@ Of course since the goal is to process calls and not let outsiders bring the sys
             fact = → if n > 0 then n*fact(fact:fact,n:n-1) else 1,
             fact(fact:fact, n:10000)
           ').should.be.rejected
+
+        it 'should support objects', ->
+          (pp '
+            the a of {a:3,b:4}
+          ').should.eventually.equal 3
+        it 'should support complex objects', ->
+          (pp '''
+            the name of the owner of the dog of { dog: { name: 'Milou', owner: { name: 'Tintin' } } }
+          ''').should.eventually.equal 'Tintin'
+        it 'should handle arrays', ->
+          (pp '''
+            the length of ['a','b','c']
+          ''').should.eventually.equal 3
+        it 'should handle arrays', ->
+          (pp '''
+            ['a','b','c'][2]
+          ''').should.eventually.equal 'c'
+        it 'should handle arrays', ->
+          (pp '''
+            ['a','b','c'][2]
+          ''').should.eventually.equal 'c'
