@@ -69,8 +69,6 @@ This function return `true` if the execution should stop.
               truth = await statement.call this
               return true if truth is 'over'
 
-              truth = not truth if statement.not
-
 Terminate the ornament and continue to the next one, if any condition or action returned false.
 
               return false unless truth
