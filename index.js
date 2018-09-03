@@ -80,9 +80,6 @@
             if (truth === 'over') {
               return true;
             }
-            if (statement.not) {
-              truth = !truth;
-            }
             if (!truth) {
               // Terminate the ornament and continue to the next one, if any condition or action returned false.
               return false;
