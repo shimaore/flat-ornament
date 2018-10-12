@@ -67,7 +67,6 @@ NAME        [A-Za-z_]+
 
 %{
 
-const Immutable = require('immutable');
 const pattern = require ('./pattern');
 const is_function = function (f) { return 'function' === typeof f }
 const reject_function = function (n,v) { if(is_function(v)) throw new Error(`Parameter ${n} might not be a function.`); return v; }
@@ -95,7 +94,7 @@ const need_function = function (n,f) { if(!is_function(f)) throw new Error(`${n}
 %% /* grammar */
 
 start
-  : expressions EOF  { return function () { return $1(this,Immutable.Map()) /* evaluate */ } }
+  : expressions EOF  { return function () { return $1(this,new Map()) /* evaluate */ } }
   |                  { return function () {} }
   ;
 
@@ -106,7 +105,7 @@ expressions
   ;
 
 assignment
-  : name ASSIGN expression  -> async function (rtx,ctx) { var name = $1; var val = await $3(rtx,ctx); return ctx.set(name,val); }
+  : name ASSIGN expression  -> async function (rtx,ctx) { var name = $1; var val = await $3(rtx,ctx); return new Map(ctx).set(name,val); }
   ;
 
 expression
@@ -145,7 +144,7 @@ expression
   | pattern  expresion            -> async function (rtx,ctx) { var a = await $2(rtx,ctx); return (typeof a === 'string') && a.match($1); }
   | expression '~' pattern        -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return (typeof a === 'string') && a.match($3); }
   | op '(' parameters ')'         -> async function (rtx,ctx) { var args  = await Promise.all($3.map( async function (a) { return await a(rtx,ctx) })); return $1.apply(rtx,args); }
-  | name '(' pairs ')'            -> async function (rtx,ctx) { var f = need_function($1,ctx.get($1)); var pairs = await Promise.all($3.map( async function ([k,a]) { var v = await a(rtx,ctx); return [k,reject_function(k,v)] })); return f(rtx,Immutable.Map(pairs)); }
+  | name '(' pairs ')'            -> async function (rtx,ctx) { var f = need_function($1,ctx.get($1)); var pairs = await Promise.all($3.map( async function ([k,a]) { var v = await a(rtx,ctx); return [k,reject_function(k,v)] })); return f(rtx,new Map(pairs)); }
   | op '(' ')'                    -> function (rtx,ctx) { return $1.apply(rtx); }
   | op                            -> function (rtx,ctx) { return $1.apply(rtx); }
   | THE op                        -> function (rtx,ctx) { return $2.apply(rtx); }
@@ -157,9 +156,9 @@ expression
   | UNLESS expression THEN expression ELSE expression -> async function (rtx,ctx) { var cond = await $2(rtx,ctx); if (!cond) { return $4(rtx,ctx) } else { return $6(rtx,ctx) } }
   | '(' expressions ')'           -> $2
   | '[' parameters ']'            -> async function (rtx,ctx) { return await Promise.all($2.map( async function (a) { return await a(rtx,ctx) })); }
-  | '{' hash_pairs '}'            -> async function (rtx,ctx) { var pairs = await Promise.all($2.map( async function ([k,a]) { var v = await a(rtx,ctx); return [k,v] })); return Immutable.Map(pairs) }
+  | '{' hash_pairs '}'            -> async function (rtx,ctx) { var pairs = await Promise.all($2.map( async function ([k,a]) { var v = await a(rtx,ctx); return [k,v] })); return new Map(pairs) }
   | '[' ']'                       -> function (rtx,ctx) { return [] }
-  | '{' '}'                       -> function (rtx,ctx) { return Immutable.Map() }
+  | '{' '}'                       -> function (rtx,ctx) { return new Map() }
   ;
 
 parameters

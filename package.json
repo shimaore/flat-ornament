@@ -19,7 +19,6 @@
     "mocha": "^5.2.0"
   },
   "dependencies": {
-    "immutable": "^4.0.0-rc.9"
   },
   "directories": {
     "test": "test"
