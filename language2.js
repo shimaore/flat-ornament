@@ -84,7 +84,7 @@ performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* actio
 var $0 = $$.length - 1;
 switch (yystate) {
 case 1:
- return function () { return $$[$0-1](this,Immutable.Map()) /* evaluate */ } 
+ return function () { return $$[$0-1](this,new Map()) /* evaluate */ } 
 break;
 case 2:
  return function () {} 
@@ -99,7 +99,7 @@ case 5: case 59:
 this.$ = $$[$0];
 break;
 case 6:
-this.$ = async function (rtx,ctx) { var name = $$[$0-2]; var val = await $$[$0](rtx,ctx); return ctx.set(name,val); };
+this.$ = async function (rtx,ctx) { var name = $$[$0-2]; var val = await $$[$0](rtx,ctx); return new Map(ctx).set(name,val); };
 break;
 case 7:
 this.$ = function (rtx,ctx) { return ctx.get($$[$0]) };
@@ -192,7 +192,7 @@ case 41:
 this.$ = async function (rtx,ctx) { var args  = await Promise.all($$[$0-1].map( async function (a) { return await a(rtx,ctx) })); return $$[$0-3].apply(rtx,args); };
 break;
 case 42:
-this.$ = async function (rtx,ctx) { var f = need_function($$[$0-3],ctx.get($$[$0-3])); var pairs = await Promise.all($$[$0-1].map( async function ([k,a]) { var v = await a(rtx,ctx); return [k,reject_function(k,v)] })); return f(rtx,Immutable.Map(pairs)); };
+this.$ = async function (rtx,ctx) { var f = need_function($$[$0-3],ctx.get($$[$0-3])); var pairs = await Promise.all($$[$0-1].map( async function ([k,a]) { var v = await a(rtx,ctx); return [k,reject_function(k,v)] })); return f(rtx,new Map(pairs)); };
 break;
 case 43:
 this.$ = function (rtx,ctx) { return $$[$0-2].apply(rtx); };
@@ -225,13 +225,13 @@ case 53:
 this.$ = async function (rtx,ctx) { return await Promise.all($$[$0-1].map( async function (a) { return await a(rtx,ctx) })); };
 break;
 case 54:
-this.$ = async function (rtx,ctx) { var pairs = await Promise.all($$[$0-1].map( async function ([k,a]) { var v = await a(rtx,ctx); return [k,v] })); return Immutable.Map(pairs) };
+this.$ = async function (rtx,ctx) { var pairs = await Promise.all($$[$0-1].map( async function ([k,a]) { var v = await a(rtx,ctx); return [k,v] })); return new Map(pairs) };
 break;
 case 55:
 this.$ = function (rtx,ctx) { return [] };
 break;
 case 56:
-this.$ = function (rtx,ctx) { return Immutable.Map() };
+this.$ = function (rtx,ctx) { return new Map() };
 break;
 case 57:
 this.$ = $$[$0-2].concat([$$[$0]]);;
@@ -415,7 +415,6 @@ parse: function parse(input) {
 }};
 
 
-const Immutable = require('immutable');
 const pattern = require ('./pattern');
 const is_function = function (f) { return 'function' === typeof f }
 const reject_function = function (n,v) { if(is_function(v)) throw new Error(`Parameter ${n} might not be a function.`); return v; }
