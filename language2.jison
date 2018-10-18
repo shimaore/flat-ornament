@@ -27,6 +27,7 @@ NAME        [A-Za-z_]+
 "and"           return 'AND'
 "or"            return 'OR'
 "not"           return 'NOT'
+"it"            return 'IT'
 "is"            return 'IS'
 "isn't"         return 'ISNT'
 "isnt"          return 'ISNT'
@@ -71,6 +72,7 @@ const pattern = require ('./pattern');
 const is_function = function (f) { return 'function' === typeof f }
 const reject_function = function (n,v) { if(is_function(v)) throw new Error(`Parameter ${n} might not be a function.`); return v; }
 const need_function = function (n,f) { if(!is_function(f)) throw new Error(`${n} should be a function.`); return f; }
+const setit = function(v,ctx) { ctx.set('it',v); return v; }
 
 %}
 
@@ -115,6 +117,7 @@ expression
   | string                        -> function (rtx,ctx) { return $1 }
   | TRUE                          -> function (rtx,ctx) { return true }
   | FALSE                         -> function (rtx,ctx) { return false }
+  | IT                            -> function (rtx,ctx) { return ctx.get('it') }
   | POSTPONE expression           -> function (rtx,ctx) { return $2 }
   | expression AND expression     -> async function (rtx,ctx) { var cond = await $1(rtx,ctx); return cond && $3(rtx,ctx) }
   | expression OR  expression     -> async function (rtx,ctx) { var cond = await $1(rtx,ctx); return cond || $3(rtx,ctx) }
@@ -136,7 +139,7 @@ expression
   | expression IS expression      -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return a === await $3(rtx,ctx) }
   | expression NE expression      -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return a !== await $3(rtx,ctx) }
   | expression ISNT expression    -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return a !== await $3(rtx,ctx) }
-  | THE name OF expression        -> async function (rtx,ctx) { var a = await $4(rtx,ctx); if ($2 === 'length') { return a.length }; if ($2 === 'size') { return a.size }; return a.get($2) }
+  | THE name OF expression        -> async function (rtx,ctx) { var a = await $4(rtx,ctx); if ($2 === 'length') { return setit(a.length,ctx) }; if ($2 === 'size') { return setit(a.size,ctx) }; return setit(a.get($2),ctx) }
   | expression '.' name           -> async function (rtx,ctx) { var a = await $1(rtx,ctx); if ($3 === 'length') { return a.length }; if ($2 === 'size') { return a.size }; return a.get($3) }
   | expression '[' integer ']'    -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return a[$3] }
   | '-' expression  %prec UMINUS  -> async function (rtx,ctx) { return - await $2(rtx,ctx) }
@@ -147,7 +150,7 @@ expression
   | name '(' pairs ')'            -> async function (rtx,ctx) { var f = need_function($1,ctx.get($1)); var pairs = await Promise.all($3.map( async function ([k,a]) { var v = await a(rtx,ctx); return [k,reject_function(k,v)] })); return f(rtx,new Map(pairs)); }
   | op '(' ')'                    -> function (rtx,ctx) { return $1.apply(rtx); }
   | op                            -> function (rtx,ctx) { return $1.apply(rtx); }
-  | THE op                        -> function (rtx,ctx) { return $2.apply(rtx); }
+  | THE op                        -> function (rtx,ctx) { return setit($2.apply(rtx),ctx); }
   | IF expression THEN expression                 -> async function (rtx,ctx) { var cond = await $2(rtx,ctx); if ( cond) return $4(rtx,ctx); }
   | UNLESS expression THEN expression             -> async function (rtx,ctx) { var cond = await $2(rtx,ctx); if (!cond) return $4(rtx,ctx); }
   | expression IF expression                      -> async function (rtx,ctx) { var cond = await $3(rtx,ctx); if ( cond) return $1(rtx,ctx); }
