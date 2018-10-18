@@ -51,6 +51,8 @@ NAME        [A-Za-z_]+
 "="             return 'ASSIGN'
 ":"             return 'ASSIGN'
 "←"             return 'ASSIGN'
+"~"             return 'MATCHES'
+"matches"       return 'MATCHES'
 
 {FLOAT}         return 'FLOAT'
 {INTEGER}       return 'INTEGER'
@@ -85,7 +87,7 @@ const setit = function(v,ctx) { ctx.set('it',v); return v; }
 %left THEN ELSE
 %left OR
 %left AND
-%left IS ISNT '~' EQ NE
+%left IS ISNT MATCHES EQ NE
 %left '<' '>' GE LE
 /* bitwise */
 %left '+' '-'
@@ -144,8 +146,8 @@ expression
   | expression '[' integer ']'    -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return a[$3] }
   | '-' expression  %prec UMINUS  -> async function (rtx,ctx) { return - await $2(rtx,ctx) }
   | '+' expression  %prec UMINUS  -> async function (rtx,ctx) { return + await $2(rtx,ctx) }
-  | pattern  expresion            -> async function (rtx,ctx) { var a = await $2(rtx,ctx); return (typeof a === 'string') && a.match($1); }
-  | expression '~' pattern        -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return (typeof a === 'string') && a.match($3); }
+  | pattern MATCHES expression    -> async function (rtx,ctx) { var a = await $2(rtx,ctx); return (typeof a === 'string') && a.match($1); }
+  | expression MATCHES pattern    -> async function (rtx,ctx) { var a = await $1(rtx,ctx); return (typeof a === 'string') && a.match($3); }
   | op '(' parameters ')'         -> async function (rtx,ctx) { var args  = await Promise.all($3.map( async function (a) { return await a(rtx,ctx) })); return $1.apply(rtx,args); }
   | name '(' pairs ')'            -> async function (rtx,ctx) { var f = need_function($1,ctx.get($1)); var pairs = await Promise.all($3.map( async function ([k,a]) { var v = await a(rtx,ctx); return [k,reject_function(k,v)] })); return f(rtx,new Map(pairs)); }
   | op '(' ')'                    -> function (rtx,ctx) { return $1.apply(rtx); }
