@@ -18,8 +18,6 @@ NAME        [A-Za-z_]+
 
 /* INITIAL */
 
-\s+             /* skip */
-
 "if"            return 'IF'
 "unless"        return 'UNLESS'
 "then"          return 'THEN'
@@ -61,12 +59,34 @@ NAME        [A-Za-z_]+
 {PATTERN}       return 'PATTERN'
 {NAME}          return (yy.op && yytext in yy.op) ? 'OP' : 'NAME'
 
-"#"[^\r\n]+[\r\n]  /* comment */
 
+"#"[^\r\n]*     /* end-of-line comment */
+[\r\n][ ]*(?=[\r\n])      return 'NL' /* empty line */
+
+[\r\n][ ]*(?="else")      %{
+    if(!yy.indent) yy.indent = [0]
+    var new_indent = yytext.length-1
+    var top_indent = yy.indent[0]
+    if (new_indent  >  top_indent) { yy.indent.unshift(new_indent); return 'INDENT' }
+    if (new_indent  <  top_indent) { yy.indent.shift(); this.unput(yytext); return 'OUTDENT' }
+  %}
+
+[\r\n][ ]*(?![\r\n]|"else")      %{
+    if(!yy.indent) yy.indent = [0]
+    var new_indent = yytext.length-1
+    var top_indent = yy.indent[0]
+    if (new_indent === top_indent) { return 'NL' }
+    if (new_indent  >  top_indent) { yy.indent.unshift(new_indent); return 'INDENT' }
+    if (new_indent  <  top_indent) { yy.indent.shift(); this.unput(yytext); return 'OUTDENT' }
+  %}
+
+[ ]+            /* skip */
 <<EOF>>         return 'EOF'
 .               return yytext
 
 /lex
+
+%start start
 
 %{
 
@@ -83,8 +103,8 @@ const setit = function(v,ctx) { ctx.set('it',v); return v; }
 %left ','
 %right POSTPONE
 %right ASSIGN
-%right IF UNLESS
-%left THEN ELSE
+%right IF UNLESS cond
+%left THEN ELSE then else
 %left OR
 %left AND
 %left IS ISNT MATCHES EQ NE
@@ -98,18 +118,43 @@ const setit = function(v,ctx) { ctx.set('it',v); return v; }
 %% /* grammar */
 
 start
-  : expressions EOF  { return function () { return $1(this,new Map()) /* evaluate */ } }
-  |                  { return function () {} }
+  : expressions EOF { return function () { return $1(this,new Map()) /* evaluate */ } }
   ;
 
 expressions
-  : assignment ',' expressions     -> async function (rtx,ctx) { var ctx = await $1(rtx,ctx); return $3(rtx,ctx); }
-  | expression ',' expressions     -> async function (rtx,ctx) { await $1(rtx,ctx); return $3(rtx,ctx); }
+  : assignment nlc expressions -> async function (rtx,ctx) { var ctx = await $1(rtx,ctx); return $3(rtx,ctx); }
+  | expression nlc expressions -> async function (rtx,ctx) { await $1(rtx,ctx); return $3(rtx,ctx); }
+  | expression nlc -> $1
   | expression -> $1
+  ;
+
+nl
+  : NL
+  | nl NL
+  ;
+
+nlc
+  : NL
+  | ','
+  | nlc NL
+  ;
+
+expressions-block
+  : INDENT expressions OUTDENT -> $2
   ;
 
 assignment
   : name ASSIGN expression  -> async function (rtx,ctx) { var name = $1; var val = await $3(rtx,ctx); return new Map(ctx).set(name,val); }
+  ;
+
+block
+  : INDENT block-lines OUTDENT -> $2
+  ;
+
+block-lines
+  : expression nl block-lines -> async function (rtx,ctx) { await $1(rtx,ctx); return $3(rtx,ctx); }
+  | expression nl -> $1
+  | expression -> $1
   ;
 
 expression
@@ -121,6 +166,7 @@ expression
   | FALSE                         -> function (rtx,ctx) { return false }
   | IT                            -> function (rtx,ctx) { return ctx.get('it') }
   | POSTPONE expression           -> function (rtx,ctx) { return $2 }
+  | POSTPONE expressions-block    -> function (rtx,ctx) { return $2 }
   | expression AND expression     -> async function (rtx,ctx) { var cond = await $1(rtx,ctx); return cond && $3(rtx,ctx) }
   | expression OR  expression     -> async function (rtx,ctx) { var cond = await $1(rtx,ctx); return cond || $3(rtx,ctx) }
   | NOT expression                -> async function (rtx,ctx) { return ! await $2(rtx,ctx) }
@@ -153,17 +199,29 @@ expression
   | op '(' ')'                    -> function (rtx,ctx) { return $1.apply(rtx); }
   | op                            -> function (rtx,ctx) { return $1.apply(rtx); }
   | THE op                        -> function (rtx,ctx) { return setit($2.apply(rtx),ctx); }
-  | IF expression THEN expression                 -> async function (rtx,ctx) { var cond = await $2(rtx,ctx); if ( cond) return $4(rtx,ctx); }
-  | UNLESS expression THEN expression             -> async function (rtx,ctx) { var cond = await $2(rtx,ctx); if (!cond) return $4(rtx,ctx); }
-  | expression IF expression                      -> async function (rtx,ctx) { var cond = await $3(rtx,ctx); if ( cond) return $1(rtx,ctx); }
-  | expression UNLESS expression                  -> async function (rtx,ctx) { var cond = await $3(rtx,ctx); if (!cond) return $1(rtx,ctx); }
-  | IF expression THEN expression ELSE expression     -> async function (rtx,ctx) { var cond = await $2(rtx,ctx); if ( cond) { return $4(rtx,ctx) } else { return $6(rtx,ctx) } }
-  | UNLESS expression THEN expression ELSE expression -> async function (rtx,ctx) { var cond = await $2(rtx,ctx); if (!cond) { return $4(rtx,ctx) } else { return $6(rtx,ctx) } }
+  | expression cond               -> async function (rtx,ctx) { var cond = await $2(rtx,ctx); if (cond) return $1(rtx,ctx); }
+  | cond then                     -> async function (rtx,ctx) { var cond = await $1(rtx,ctx); if (cond) return $2(rtx,ctx); }
+  | cond then else                -> async function (rtx,ctx) { var cond = await $1(rtx,ctx); if (cond) { return $2(rtx,ctx) } else { return $3(rtx,ctx) } }
   | '(' expressions ')'           -> $2
   | '[' parameters ']'            -> async function (rtx,ctx) { return await Promise.all($2.map( async function (a) { return await a(rtx,ctx) })); }
   | '{' hash_pairs '}'            -> async function (rtx,ctx) { var pairs = await Promise.all($2.map( async function ([k,a]) { var v = await a(rtx,ctx); return [k,v] })); return new Map(pairs) }
   | '[' ']'                       -> function (rtx,ctx) { return [] }
   | '{' '}'                       -> function (rtx,ctx) { return new Map() }
+  ;
+
+cond
+  : IF expression       -> $2
+  | UNLESS expression   -> async function (rtx,ctx) { var cond = await $2(rtx,ctx); return !cond; }
+  ;
+
+then
+  : THEN expression -> $2
+  | block           -> $1
+  ;
+
+else
+  : ELSE expression -> $2
+  | ELSE block      -> $2
   ;
 
 parameters
@@ -176,7 +234,7 @@ parameter
   ;
 
 pairs
-  : pairs ',' pair  -> $1.concat([$3])
+  : pairs nlc pair  -> $1.concat([$3])
   | pair            -> [$1]
   ;
 
@@ -185,7 +243,7 @@ pair
   ;
 
 hash_pairs
-  : hash_pairs ',' hash_pair  -> $1.concat([$3])
+  : hash_pairs nlc hash_pair  -> $1.concat([$3])
   | hash_pair                 -> [$1]
   ;
 

@@ -39,23 +39,47 @@
         it 'should do variables', ->
           expect(await pp 'foo = "hello ", foo + "world"').to.equal 'hello world'
           expect(await pp 'foo = "hello ", promise(foo + "world")').to.equal 'hello world'
-          expect(await pp '
+          expect(await pp '''
             a = 1,
             b = 3,
             c = 6.7,
             a+b+c
-          ').to.equal 10.7
-          expect(await pp '
+          ''').to.equal 10.7
+          expect(await pp '''
             n = 2,
             n = n-1,
             n = n+4,
             n*5
-          ').to.equal 25
+          ''').to.equal 25
+          expect(await pp '''
+            foo = "hello "
+            foo + "world"
+          ''').to.equal 'hello world'
+          expect(await pp '''
+            foo = "hello "
+            promise(foo + "world")
+          ''').to.equal 'hello world'
+          expect(await pp '''
+            a = 1
+            b = 3
+            c = 6.7
+            a+b+c
+          ''').to.equal 10.7
+          expect(await pp '''
+            n = 2
+            n = n-1
+            n = n+4
+            n*5
+          ''').to.equal 25
         it 'should do conditionals', ->
-          expect(await pp '
+          expect(await pp '''
             foo = "hello ",
             if sqrt(42) > 5 then promise(foo + "world") else "pooh"
-          ').to.equal 'hello world'
+          ''').to.equal 'hello world'
+          expect(await pp '''
+            foo = "hello "
+            if sqrt(42) > 5 then promise(foo + "world") else "pooh"
+          ''').to.equal 'hello world'
           expect(await pp '
             if 3 > 4 then "ok" else "no"
           ').to.equal 'no'
@@ -68,10 +92,14 @@
           expect(await pp '
             if 3 > 4 then true else false if true
           ').to.equal false
-          expect(await pp '
+          expect(await pp '''
             bear = 42,
             if it > 42 then true else false
-          ').to.equal false
+          ''').to.equal false
+          expect(await pp '''
+            bear = 42
+            if it > 42 then true else false
+          ''').to.equal false
         it 'should do field access', ->
           expect(await pp '
             the length of "hello"
@@ -89,11 +117,24 @@
             set("bear",42)
           ').to.equal 42
           expect(state.get 'bear').to.equal 42
-          expect(await pp '
+          expect(await pp '''
+            a = 3, b = true,
+            if b then set("dog",get("bear")*a)
+          ''').to.equal 126
+          expect(await pp '''
             a = 3,
             b = true,
             if b then set("dog",get("bear")*a)
-          ').to.equal 126
+          ''').to.equal 126
+          expect(await pp '''
+            a = 3
+            b = true
+            if b then set("dog",get("bear")*a)
+          ''').to.equal 126
+          expect(await pp '''
+            a = 3, b = true
+            if b then set("dog",get("bear")*a)
+          ''').to.equal 126
           expect(state.get 'bear').to.equal 42
           expect(state.get 'dog').to.equal 126
           expect(await pp '
@@ -101,64 +142,89 @@
           ').to.equal state.get 'ant'
 
         it 'should postpone', ->
-          expect(await pp '
+          expect(await pp '''
             close = postpone ( a = 2*b, a+c ),
             close( b= 4, c: 10 )
-          ').to.equal 2*4+10
+          ''').to.equal 2*4+10
+          expect(await pp '''
+            close = postpone ( a = 2*b, a+c )
+            close( b= 4, c: 10 )
+          ''').to.equal 2*4+10
+          expect(await pp '''
+            close = postpone
+              a = 2*b
+              a+c
+            close( b= 4, c: 10 )
+          ''').to.equal 2*4+10
         it 'should postpone and accept parameter evaluation', ->
-          await (pp '
-            close = postpone ( a = 2*b, a+c ),
+          await (pp '''
+            close = postpone
+              a = 2*b
+              a+c
             close( b= 43*get("ant"), c: 10 )
-          ').should.eventually.equal 2*43*state.get('ant')+10
-          await (pp '
-            mul = → a*b,
-            add = → a+b,
+          ''').should.eventually.equal 2*43*state.get('ant')+10
+          await (pp '''
+            mul = → a*b
+            add = → a+b
             add(a=3,b:4)
-          ').should.eventually.equal 3+4
-          await (pp '
-            mul = → a*b,
-            add = → a+b,
+          ''').should.eventually.equal 3+4
+          await (pp '''
+            mul = → a*b
+            add = → a+b
             mul(a:3,b=4)
-          ').should.eventually.equal 3*4
-          await (pp '
-            mul = → a*b,
-            add = → a+b,
+          ''').should.eventually.equal 3*4
+          await (pp '''
+            mul = → a*b
+            add = → a+b
             mul(a:3,b=add(a=1,b:3))
-          ').should.eventually.equal 3*4
-          await (pp '
-            mul = → a*b,
-            add = → a+b,
+          ''').should.eventually.equal 3*4
+          await (pp '''
+            mul = → a*b
+            add = → a+b
             mul( a:add(a=3,b=4), b=add(b:8,a=6) )
-          ').should.eventually.equal (3+4)*(6+8)
+          ''').should.eventually.equal (3+4)*(6+8)
 
 The language is complex enough to support recursion.
 Of course since the goal is to process calls and not let outsiders bring the system down, that's probably too much power.
 (Essentially we're trying to build a language in which termination is decidable.)
 
         it 'should not recurse (Peter-Ackermann)', ->
-          (pp '
+          (pp '''
             A = →
-              if m is 0 then n+1 else
-              if m > 0 and n is 0 then A(A:A,m:m-1,n:n-1) else
-              if m > 0 and n > 0 then A(A:A,m:m-1,n:A(A:A,m:m,n:n-1)),
+              if m is 0
+                n+1
+              else
+                if m > 0 and n is 0
+                  A(A:A,m:m-1,n:n-1)
+                else
+                  if m > 0 and n > 0
+                    A(A:A,m:m-1,n:A(A:A,m:m,n:n-1))
 
             A(A:A,m:4,n:3)
-          ').should.be.rejected
+          ''').should.be.rejected
         it 'should not recurse (factorial 1)', ->
-          (pp '
+          (pp '''
             fact = → if n > 0 then n*fact(fact:fact,n:n-1) else 1,
             fact(fact:fact, n:1)
-          ').should.be.rejected
+          ''').should.be.rejected
+          (pp '''
+            fact = → if n > 0 then n*fact(fact:fact,n:n-1) else 1
+            fact(fact:fact, n:1)
+          ''').should.be.rejected
         it 'should not recurse (factorial 10000)', ->
-          (pp '
+          (pp '''
             fact = → if n > 0 then n*fact(fact:fact,n:n-1) else 1,
             fact(fact:fact, n:10000)
-          ').should.be.rejected
+          ''').should.be.rejected
+          (pp '''
+            fact = → if n > 0 then n*fact(fact:fact,n:n-1) else 1
+            fact(fact:fact, n:10000)
+          ''').should.be.rejected
 
         it 'should support objects', ->
-          (pp '
+          (pp '''
             the a of {a:3,b:4}
-          ').should.eventually.equal 3
+          ''').should.eventually.equal 3
         it 'should support objects size', ->
           (pp '
             the size of {a:3,b:4}
@@ -179,3 +245,56 @@ Of course since the goal is to process calls and not let outsiders bring the sys
           (pp '''
             ['a','b','c'][2]
           ''').should.eventually.equal 'c'
+        it 'should have it', ->
+          (pp '''
+            map = { bear: 3 }
+            if the bear of map is greater than 2 and it is less than 5 then "bear" else "cat"
+          ''').should.eventually.equal 'bear'
+        it 'should have indent (1)', ->
+          (pp '''
+            if true
+              "bear"
+            else
+              "cat"
+
+          ''').should.eventually.equal 'bear'
+        it.skip 'should have indent (2)', ->
+          (pp '''
+            if true
+              "bear"
+            else
+              "cat"
+          ''').should.eventually.equal 'bear'
+        it 'should have indent (3)', ->
+          (pp '''
+            if true
+              "dog"
+            else
+              "cat"
+            "bear"
+          ''').should.eventually.equal 'bear'
+        it 'should have indent (4)', ->
+          (pp '''
+            if true
+              "dog"
+            else
+              "cat"
+
+            "bear"
+          ''').should.eventually.equal 'bear'
+        it 'should have indent', ->
+          (pp '''
+            if true
+              false
+            else
+              true
+            # at one
+            map = { bear: 3 }
+            if the bear of map is greater than 2 and it is less than 5
+              sqrt(42)
+              "bear"
+            else
+              53
+              "cat"
+            # end
+          ''').should.eventually.equal 'bear'
