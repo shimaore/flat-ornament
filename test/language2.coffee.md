@@ -221,6 +221,10 @@ Of course since the goal is to process calls and not let outsiders bring the sys
             fact(fact:fact, n:10000)
           ''').should.be.rejected
 
+        it 'should support Unicode names', ->
+          (pp '''
+            the ouvré of {ouvré:3,fermé:4}
+          ''').should.eventually.equal 3
         it 'should support objects', ->
           (pp '''
             the a of {a:3,b:4}

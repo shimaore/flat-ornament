@@ -7,7 +7,7 @@ INTEGER     [0-9]+
 STRING1     [']([^'\r\n]*)[']
 STRING2     ["]([^"\r\n]*)["]
 PATTERN     [/](\d|\?|\.|\.\.|\.\.\.|…)+[/]
-NAME        [A-Za-z_]+
+NAME        [\p{Lu}\p{Ll}_]+
 
 %token OP NAME
 
