@@ -197,6 +197,7 @@ expression
   | op '(' parameters ')'         -> async function (rtx,ctx) { var args  = await Promise.all($3.map( async function (a) { return await a(rtx,ctx) })); return $1.apply(rtx,args); }
   | name '(' pairs ')'            -> async function (rtx,ctx) { var f = need_function($1,ctx.get($1)); var pairs = await Promise.all($3.map( async function ([k,a]) { var v = await a(rtx,ctx); return [k,reject_function(k,v)] })); return f(rtx,new Map(pairs)); }
   | op '(' ')'                    -> function (rtx,ctx) { return $1.apply(rtx); }
+  | name '(' ')'                  -> function (rtx,ctx) { var f = need_function($1,ctx.get($1)); return f(rtx,new Map()); }
   | op                            -> function (rtx,ctx) { return $1.apply(rtx); }
   | THE op                        -> function (rtx,ctx) { return setit($2.apply(rtx),ctx); }
   | expression cond               -> async function (rtx,ctx) { var cond = await $2(rtx,ctx); if (cond) return $1(rtx,ctx); }
